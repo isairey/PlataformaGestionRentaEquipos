@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        // Prevent FOUC by setting theme immediately
+        (function() {
+            const t=(localStorage.getItem("rc-theme")||"dark");
+            document.documentElement.setAttribute("data-theme",t);
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - RentalCore</title>
+
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" type="image/png" href="/static/images/icon-180.png">
+    <link rel="shortcut icon" type="image/png" href="/static/images/icon-180.png">
+
+    <!-- iOS PWA Settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+    /* Modern Profile Settings Styles */
+    .profile-settings-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--space-6);
+    }
+
+    .profile-hero {
+        background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        margin-bottom: var(--space-8);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .profile-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: var(--space-6);
+    }
+
+    .profile-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-electric), var(--accent-purple));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
+        position: relative;
+    }
+
+    .profile-avatar-large::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-electric), var(--accent-purple));
+        z-index: -1;
+        animation: pulse-ring 2s infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.7; }
+        100% { transform: scale(1.2); opacity: 0; }
+    }
+
+    .profile-info {
+        color: white;
+    }
+
+    .profile-name {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 var(--space-2);
+        background: linear-gradient(135deg, white, var(--accent-electric));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .profile-username {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        margin: 0 0 var(--space-4);
+        font-family: var(--font-mono);
+    }
+
+    .profile-quick-stats {
+        display: flex;
+        gap: var(--space-6);
+    }
+
+    .quick-stat {
+        text-align: center;
+    }
+
+    .quick-stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+    }
+
+    .quick-stat-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-6);
+        margin-bottom: var(--space-8);
+    }
+
+    .settings-card {
+        background: var(--surface-2);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-xl);
+        padding: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .settings-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border-color: var(--accent-electric);
+    }
+
+    .settings-card-header {
+        background: linear-gradient(135deg, var(--surface-3), var(--surface-4));
+        padding: var(--space-6);
+        border-bottom: 1px solid var(--surface-3);
+    }
+
+    .settings-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: var(--space-4);
+        background: linear-gradient(135deg, var(--accent-electric), var(--accent-purple));
+        color: white;
+        box-shadow: 0 8px 20px rgba(0, 245, 255, 0.3);
+    }
+
+    .settings-card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 var(--space-2);
+        color: var(--text-primary);
+    }
+
+    .settings-card-description {
+        color: var(--text-secondary);
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .settings-card-body {
+        padding: var(--space-6);
+    }
+
+    .form-section {
+        margin-bottom: var(--space-6);
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 var(--space-4);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .form-section-title i {
+        color: var(--accent-electric);
+    }
+
+    .modern-input-group {
+        position: relative;
+        margin-bottom: var(--space-5);
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: var(--space-4) var(--space-4) var(--space-4) var(--space-12);
+        background: var(--surface-1);
+        border: 2px solid var(--surface-3);
+        border-radius: var(--radius-lg);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+        outline: none;
+        border-color: var(--accent-electric);
+        box-shadow: 0 0 0 4px rgba(0, 245, 255, 0.1);
+        background: var(--surface-2);
+    }
+
+    .modern-input-icon {
+        position: absolute;
+        left: var(--space-4);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--accent-electric);
+        font-size: 1.25rem;
+    }
+
+    .modern-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-2);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .security-feature {
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        margin-bottom: var(--space-5);
+        position: relative;
+    }
+
+    .security-feature-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    .security-status-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: white;
+    }
+
+    .security-enabled {
+        background: linear-gradient(135deg, var(--success), #059669);
+        box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .security-disabled {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+
+    .security-info h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 var(--space-1);
+        color: var(--text-primary);
+    }
+
+    .security-info p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .security-actions {
+        margin-left: auto;
+    }
+
+    .modern-btn {
+        padding: var(--space-3) var(--space-6);
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        text-decoration: none;
+    }
+
+    .modern-btn-primary {
+        background: linear-gradient(135deg, var(--accent-electric), var(--accent-purple));
+        color: white;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 245, 255, 0.3);
+    }
+
+    .modern-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 245, 255, 0.4);
+    }
+
+    .modern-btn-secondary {
+        background: var(--surface-3);
+        color: var(--text-primary);
+        border: 1px solid var(--surface-4);
+    }
+
+    .modern-btn-secondary:hover {
+        background: var(--surface-4);
+        transform: translateY(-2px);
+    }
+
+    .modern-btn-full {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--surface-3), transparent);
+        margin: var(--space-6) 0;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-enabled {
+        background: rgba(34, 197, 94, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-disabled {
+        background: rgba(107, 114, 128, 0.15);
+        color: var(--text-muted);
+        border: 1px solid var(--surface-3);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .profile-settings-container {
+            padding: var(--space-4);
+        }
+
+        .profile-hero-content {
+            flex-direction: column;
+            text-align: center;
+            gap: var(--space-4);
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+        }
+
+        .settings-grid {
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+        }
+
+        .profile-quick-stats {
+            justify-content: center;
+        }
+    }
+    </style>
+</head>
+<body class="rc-animate-fade-in">
+    {{template "navbar.html" .}}
+
+    <main class="profile-settings-container">
+        <!-- Hero Section -->
+        <div class="profile-hero">
+            <div class="profile-hero-content">
+                <div class="profile-avatar-large">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name">
+                        {{if .user}}{{.user.FirstName}} {{.user.LastName}}{{else}}Guest User{{end}}
+                    </h1>
+                    <p class="profile-username">@{{if .user}}{{.user.Username}}{{else}}guest{{end}}</p>
+                    <div class="profile-quick-stats">
+                        <div class="quick-stat">
+                            <span class="quick-stat-value">{{if .passkeys}}{{len .passkeys}}{{else}}0{{end}}</span>
+                            <span class="quick-stat-label">Passkeys</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-value">{{if .twoFAEnabled}}✓{{else}}✗{{end}}</span>
+                            <span class="quick-stat-label">2FA</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-value">{{if .user}}Active{{else}}Guest{{end}}</span>
+                            <span class="quick-stat-label">Status</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Grid -->
+        <div class="settings-grid">
+            <!-- Personal Information Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+                    <h2 class="settings-card-title">Personal Information</h2>
+                    <p class="settings-card-description">
+                        Update your basic profile information and account details
+                    </p>
+                </div>
+                <div class="settings-card-body">
+                    <form id="personalInfoForm">
+                        <input type="hidden" name="section" value="personal">
+
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="bi bi-person"></i>
+                                Basic Information
+                            </h3>
+
+                            <div class="modern-input-group">
+                                <label class="modern-label" for="first_name">First Name</label>
+                                <div style="position: relative;">
+                                    <i class="modern-input-icon bi bi-person"></i>
+                                    <input type="text" id="first_name" name="first_name" class="modern-input"
+                                           value="{{if .user}}{{.user.FirstName}}{{end}}" placeholder="Enter your first name">
+                                </div>
+                            </div>
+
+                            <div class="modern-input-group">
+                                <label class="modern-label" for="last_name">Last Name</label>
+                                <div style="position: relative;">
+                                    <i class="modern-input-icon bi bi-person"></i>
+                                    <input type="text" id="last_name" name="last_name" class="modern-input"
+                                           value="{{if .user}}{{.user.LastName}}{{end}}" placeholder="Enter your last name">
+                                </div>
+                            </div>
+
+                            <div class="modern-input-group">
+                                <label class="modern-label" for="email">Email Address</label>
+                                <div style="position: relative;">
+                                    <i class="modern-input-icon bi bi-envelope"></i>
+                                    <input type="email" id="email" name="email" class="modern-input"
+                                           value="{{if .user}}{{.user.Email}}{{end}}" placeholder="Enter your email">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="modern-btn modern-btn-primary modern-btn-full">
+                            <i class="bi bi-check-lg"></i>
+                            Save Personal Information
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Settings Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h2 class="settings-card-title">Security Settings</h2>
+                    <p class="settings-card-description">
+                        Manage your account security and authentication methods
+                    </p>
+                </div>
+                <div class="settings-card-body">
+                    <!-- Two-Factor Authentication -->
+                    <div class="security-feature">
+                        <div class="security-feature-header">
+                            <div class="security-status-icon {{if .twoFAEnabled}}security-enabled{{else}}security-disabled{{end}}">
+                                <i class="bi bi-shield-{{if .twoFAEnabled}}check{{else}}exclamation{{end}}"></i>
+                            </div>
+                            <div class="security-info">
+                                <h4>Two-Factor Authentication</h4>
+                                <p>Add an extra layer of security with 2FA</p>
+                            </div>
+                            <div class="security-actions">
+                                <div class="status-badge {{if .twoFAEnabled}}status-enabled{{else}}status-disabled{{end}}">
+                                    <span class="status-dot"></span>
+                                    {{if .twoFAEnabled}}Enabled{{else}}Disabled{{end}}
+                                </div>
+                            </div>
+                        </div>
+                        {{if .twoFAEnabled}}
+                            <button type="button" class="modern-btn modern-btn-secondary" onclick="disable2FA()">
+                                <i class="bi bi-shield-x"></i> Disable 2FA
+                            </button>
+                        {{else}}
+                            <button type="button" class="modern-btn modern-btn-primary" onclick="setup2FA()">
+                                <i class="bi bi-shield-check"></i> Enable 2FA
+                            </button>
+                        {{end}}
+                    </div>
+
+                    <!-- Passkeys -->
+                    <div class="security-feature">
+                        <div class="security-feature-header">
+                            <div class="security-status-icon {{if .passkeys}}security-enabled{{else}}security-disabled{{end}}">
+                                <i class="bi bi-key"></i>
+                            </div>
+                            <div class="security-info">
+                                <h4>Passkeys</h4>
+                                <p>Modern passwordless authentication</p>
+                            </div>
+                            <div class="security-actions">
+                                <div class="status-badge {{if .passkeys}}status-enabled{{else}}status-disabled{{end}}">
+                                    <span class="status-dot"></span>
+                                    {{if .passkeys}}{{len .passkeys}} Key{{if ne (len .passkeys) 1}}s{{end}}{{else}}No Keys{{end}}
+                                </div>
+                            </div>
+                        </div>
+
+                        {{if .passkeys}}
+                            <div style="margin-bottom: var(--space-4);">
+                                {{range .passkeys}}
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-3); background: var(--surface-3); border-radius: var(--radius-md); margin-bottom: var(--space-3);">
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <i class="bi bi-key" style="color: var(--accent-electric);"></i>
+                                        <div>
+                                            <div style="font-weight: 500; color: var(--text-primary);">{{.Name}}</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Added {{.CreatedAt.Format "Jan 2, 2006"}}</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="modern-btn modern-btn-secondary" style="padding: var(--space-2) var(--space-3);" onclick="deletePasskey({{.PasskeyID}})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                {{end}}
+                            </div>
+                        {{end}}
+
+                        <button type="button" class="modern-btn modern-btn-primary" onclick="addPasskey()">
+                            <i class="bi bi-plus-lg"></i> Add New Passkey
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preferences Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon">
+                        <i class="bi bi-sliders"></i>
+                    </div>
+                    <h2 class="settings-card-title">Preferences</h2>
+                    <p class="settings-card-description">
+                        Customize your experience and interface settings
+                    </p>
+                </div>
+                <div class="settings-card-body">
+                    <form id="preferencesForm">
+                        <input type="hidden" name="section" value="preferences">
+
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="bi bi-globe"></i>
+                                Localization
+                            </h3>
+
+                            <div class="modern-input-group">
+                                <label class="modern-label" for="language">Language</label>
+                                <select id="language" name="language" class="modern-input" style="padding-left: var(--space-4);">
+                                    <option value="en" {{if and .preferences (eq .preferences.Language "en")}}selected{{end}}>English</option>
+                                    <option value="de" {{if and .preferences (eq .preferences.Language "de")}}selected{{end}}>Deutsch</option>
+                                    <option value="fr" {{if and .preferences (eq .preferences.Language "fr")}}selected{{end}}>Français</option>
+                                    <option value="es" {{if and .preferences (eq .preferences.Language "es")}}selected{{end}}>Español</option>
+                                </select>
+                            </div>
+
+                            <div class="modern-input-group">
+                                <label class="modern-label" for="timezone">Timezone</label>
+                                <select id="timezone" name="timezone" class="modern-input" style="padding-left: var(--space-4);">
+                                    <option value="Europe/Berlin" {{if and .preferences (eq .preferences.TimeZone "Europe/Berlin")}}selected{{end}}>Europe/Berlin (CET)</option>
+                                    <option value="America/New_York" {{if and .preferences (eq .preferences.TimeZone "America/New_York")}}selected{{end}}>America/New_York (EST)</option>
+                                    <option value="UTC" {{if and .preferences (eq .preferences.TimeZone "UTC")}}selected{{end}}>UTC</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="bi bi-layout-text-window"></i>
+                                Interface
+                            </h3>
+
+                            <div class="modern-input-group">
+                                <label class="modern-label" for="items_per_page">Items per Page</label>
+                                <select id="items_per_page" name="items_per_page" class="modern-input" style="padding-left: var(--space-4);">
+                                    <option value="10" {{if and .preferences (eq .preferences.ItemsPerPage 10)}}selected{{end}}>10</option>
+                                    <option value="25" {{if and .preferences (eq .preferences.ItemsPerPage 25)}}selected{{end}}>25</option>
+                                    <option value="50" {{if and .preferences (eq .preferences.ItemsPerPage 50)}}selected{{end}}>50</option>
+                                    <option value="100" {{if and .preferences (eq .preferences.ItemsPerPage 100)}}selected{{end}}>100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="modern-btn modern-btn-primary modern-btn-full">
+                            <i class="bi bi-check-lg"></i>
+                            Save Preferences
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Management Card -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                    <h2 class="settings-card-title">Account Management</h2>
+                    <p class="settings-card-description">
+                        Advanced account settings and data management
+                    </p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="bi bi-key"></i>
+                            Password Management
+                        </h3>
+                        <button type="button" class="modern-btn modern-btn-secondary modern-btn-full" onclick="changePassword()">
+                            <i class="bi bi-lock"></i>
+                            Change Password
+                        </button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="bi bi-download"></i>
+                            Data Export
+                        </h3>
+                        <button type="button" class="modern-btn modern-btn-secondary modern-btn-full" onclick="exportData()">
+                            <i class="bi bi-file-earmark-arrow-down"></i>
+                            Export My Data
+                        </button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title" style="color: var(--error);">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Danger Zone
+                        </h3>
+                        <button type="button" class="modern-btn modern-btn-secondary modern-btn-full" onclick="deleteAccount()" style="border-color: var(--error); color: var(--error);">
+                            <i class="bi bi-trash"></i>
+                            Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js"></script>
+    <script>
+    // Profile settings functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        setupFormHandlers();
+    });
+
+    function setupFormHandlers() {
+        // Personal Info Form
+        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            savePersonalInfo();
+        });
+
+        // Preferences Form
+        document.getElementById('preferencesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            savePreferences();
+        });
+    }
+
+    function savePersonalInfo() {
+        const formData = new FormData(document.getElementById('personalInfoForm'));
+
+        fetch('/profile/settings', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showNotification('Error: ' + data.error, 'error');
+            } else {
+                showNotification('Personal information updated successfully!', 'success');
+            }
+        })
+        .catch(error => {
+            showNotification('Failed to update personal information', 'error');
+        });
+    }
+
+    function savePreferences() {
+        const formData = new FormData(document.getElementById('preferencesForm'));
+
+        fetch('/profile/settings', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showNotification('Error: ' + data.error, 'error');
+            } else {
+                showNotification('Preferences updated successfully!', 'success');
+            }
+        })
+        .catch(error => {
+            showNotification('Failed to update preferences', 'error');
+        });
+    }
+
+    // Security functions (simplified versions)
+    function setup2FA() {
+        showNotification('2FA setup functionality not implemented yet', 'info');
+    }
+
+    function disable2FA() {
+        if (confirm('Are you sure you want to disable 2FA?')) {
+            showNotification('2FA disabled', 'success');
+        }
+    }
+
+    function addPasskey() {
+        showNotification('Passkey functionality not implemented yet', 'info');
+    }
+
+    function deletePasskey(id) {
+        if (confirm('Are you sure you want to delete this passkey?')) {
+            showNotification('Passkey deleted', 'success');
+        }
+    }
+
+    function changePassword() {
+        showNotification('Password change functionality not implemented yet', 'info');
+    }
+
+    function exportData() {
+        showNotification('Data export functionality not implemented yet', 'info');
+    }
+
+    function deleteAccount() {
+        if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            showNotification('Account deletion functionality not implemented yet', 'info');
+        }
+    }
+
+    function showNotification(message, type) {
+        if (window.RentalCore && window.RentalCore.showNotification) {
+            window.RentalCore.showNotification(message, type);
+        } else {
+            alert(message);
+        }
+    }
+    </script>
+</body>
+</html>

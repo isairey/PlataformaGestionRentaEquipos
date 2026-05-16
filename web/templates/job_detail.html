@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        // Prevent FOUC by setting theme immediately
+        (function() {
+            const t=(localStorage.getItem("rc-theme")||"dark");
+            document.documentElement.setAttribute("data-theme",t);
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - RentalCore</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="rc-animate-fade-in">
+    <!-- Navigation -->
+    <nav class="rc-navbar">
+        <div class="rc-container">
+            <div class="rc-navbar-content">
+                <a href="/" class="rc-navbar-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore
+                </a>
+                
+                <!-- Mobile toggle -->
+                <button class="rc-navbar-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Main navigation -->
+                <ul class="rc-navbar-nav">
+                    <li><a href="/jobs" class="rc-nav-link active">
+                        <i class="bi bi-briefcase"></i> Jobs
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link">
+                        <i class="bi bi-cpu"></i> Devices
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
+                        <i class="bi bi-people"></i> Customers
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
+                        <i class="bi bi-box"></i> Cases
+                    </a></li>
+                    
+                    <!-- Tools Dropdown -->
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-tools"></i> Tools
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-folder"></i> Management
+                            </div>
+                            </a>
+                            <a href="/workflow/packages" class="rc-dropdown-item">
+                                <i class="bi bi-box-seam"></i> Equipment Packages
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-building"></i> Business
+                            </div>
+                            <a href="/invoices" class="rc-dropdown-item">
+                                <i class="bi bi-file-text"></i> Invoices
+                            </a>
+                            <a href="/analytics" class="rc-dropdown-item">
+                                <i class="bi bi-graph-up"></i> Analytics
+                            </a>
+                            <a href="/financial" class="rc-dropdown-item">
+                                <i class="bi bi-calculator"></i> Financial
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- User Dropdown -->
+                    {{if .user}}
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-person-circle"></i> {{.user.Username}}
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
+                            </div>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Personal</div>
+                            <a href="/profile/settings" class="rc-dropdown-item">
+                                <i class="bi bi-person-gear"></i> Profile Settings
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Company</div>
+                            <a href="/settings/company" class="rc-dropdown-item">
+                                <i class="bi bi-building-gear"></i> Company Settings
+                            </a>
+                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">System</div>
+                            <a href="/users" class="rc-dropdown-item">
+                                <i class="bi bi-people-fill"></i> User Management
+                            </a>
+                            <a href="/security" class="rc-dropdown-item">
+                                <i class="bi bi-shield-check"></i> Security & Audit
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <a href="/logout" class="rc-dropdown-item">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                    {{else}}
+                    <li>
+                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    {{end}}
+                    
+                    <!-- Theme Toggle -->
+                    <li>
+                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        <!-- Job Header -->
+        <div class="rc-flex rc-flex-between rc-mb-xl">
+            <div>
+                <!-- Breadcrumb -->
+                <nav class="rc-breadcrumb rc-mb-md">
+                    <a href="/jobs" class="rc-breadcrumb-item">Jobs</a>
+                    <span class="rc-breadcrumb-separator"><i class="bi bi-chevron-right"></i></span>
+                    <span class="rc-breadcrumb-item rc-breadcrumb-current">Job #{{.job.JobID}}</span>
+                </nav>
+                
+                <h1 class="rc-heading-1 rc-mb-sm">{{.job.Description}}</h1>
+                <div class="rc-flex rc-flex-gap-md" style="align-items: center;">
+                    <span class="rc-text-secondary">
+                        <i class="bi bi-person"></i> {{.job.Customer.GetDisplayName}}
+                    </span>
+                    <span class="rc-badge {{if eq .job.Status.Status "open"}}rc-badge-warning{{else if eq .job.Status.Status "in progress"}}rc-badge-info{{else if eq .job.Status.Status "paid"}}rc-badge-success{{else}}rc-badge-secondary{{end}}">
+                        {{.job.Status.Status}}
+                    </span>
+                </div>
+            </div>
+            <div class="rc-flex rc-flex-gap-sm">
+                <a href="/jobs/{{.job.JobID}}/edit" class="rc-btn rc-btn-outline rc-btn-sm">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="/scan/{{.job.JobID}}" class="rc-btn rc-btn-primary rc-btn-sm">
+                    <i class="bi bi-qr-code-scan"></i> Scan Devices
+                </a>
+            </div>
+        </div>
+
+        <div class="rc-grid rc-grid-cols-1 rc-grid-cols-lg-4 rc-grid-gap-lg">
+            <!-- Job Information -->
+            <div class="rc-grid-span-1">
+                <div class="rc-card rc-mb-lg">
+                    <div class="rc-card-header">
+                        <h3 class="rc-card-title"><i class="bi bi-info-circle"></i> Job Details</h3>
+                    </div>
+                    <div class="rc-card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Start Date</label>
+                                <span>{{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{else}}-{{end}}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>End Date</label>
+                                <span>{{if .job.EndDate}}{{.job.EndDate.Format "02.01.2006"}}{{else}}-{{end}}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Revenue</label>
+                                <span class="rc-text-accent">€{{printf "%.2f" .job.Revenue}}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Total Devices</label>
+                                <span>{{.totalDevices}}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Equipment Value</label>
+                                <span class="rc-text-accent">€{{printf "%.2f" .totalValue}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment Groups -->
+            <div class="rc-grid-span-3">
+                <div class="rc-card">
+                    <div class="rc-card-header">
+                        <h3 class="rc-card-title"><i class="bi bi-box-seam"></i> Equipment</h3>
+                        <a href="/scan/{{.job.JobID}}" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-plus-lg"></i> Add Devices
+                        </a>
+                    </div>
+                    <div class="rc-card-body">
+                        {{if .productGroups}}
+                        <div class="equipment-groups">
+                            {{range $productName, $group := .productGroups}}
+                            <div class="equipment-group">
+                                <div class="equipment-header" onclick="toggleEquipmentGroup(this)">
+                                    <div class="equipment-info">
+                                        <h4>{{$productName}}</h4>
+                                        <span class="rc-text-secondary">{{$group.Count}} devices • €{{printf "%.2f" $group.TotalValue}}</span>
+                                    </div>
+                                    <div class="equipment-actions">
+                                        <i class="bi bi-chevron-down toggle-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="equipment-devices" style="display: block;">
+                                    {{range $group.Devices}}
+                                    <div class="equipment-device rc-flex rc-flex-between rc-mb-sm">
+                                        <div class="device-info">
+                                            <strong>{{if .Device.SerialNumber}}{{derefString .Device.SerialNumber}}{{else}}{{.Device.DeviceID}}{{end}}</strong>
+                                            <div class="rc-text-sm rc-text-secondary">
+                                                {{if .Device.Product}}{{.Device.Product.Name}}{{else}}No Product{{end}}
+                                            </div>
+                                        </div>
+                                        <div class="device-actions rc-flex rc-flex-gap-xs">
+                                            <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="showDeviceDetails({{.Device.DeviceID}})" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="removeDeviceFromJob({{$.job.JobID}}, {{.Device.DeviceID}})" title="Remove">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+                        {{else}}
+                        <div class="rc-text-center rc-p-xl">
+                            <i class="bi bi-box" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <h4 class="rc-text-muted">No Equipment Assigned</h4>
+                            <p class="rc-text-secondary">Start by scanning devices or adding them manually.</p>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+
+                <!-- Job Attachments -->
+                <div class="rc-card rc-mt-lg">
+                    <div class="rc-card-header">
+                        <h3 class="rc-card-title"><i class="bi bi-paperclip"></i> Attachments</h3>
+                        <button class="rc-btn rc-btn-primary rc-btn-sm" onclick="showUploadModal()">
+                            <i class="bi bi-plus-lg"></i> Add File
+                        </button>
+                    </div>
+                    <div class="rc-card-body">
+                        <div id="attachments-list">
+                            <!-- Attachments will be loaded here -->
+                            <div class="rc-text-center rc-p-lg" id="loading-attachments">
+                                <i class="bi bi-arrow-clockwise" style="animation: spin 1s linear infinite;"></i>
+                                Loading attachments...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Modal -->
+        <div id="uploadModal" class="rc-modal" style="display: none;">
+            <div class="rc-modal-backdrop" onclick="hideUploadModal()"></div>
+            <div class="rc-modal-content">
+                <div class="rc-modal-header">
+                    <h3 class="rc-modal-title">Upload File</h3>
+                    <button class="rc-modal-close" onclick="hideUploadModal()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div class="rc-modal-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <input type="hidden" name="jobID" value="{{.job.JobID}}">
+
+                        <div class="rc-form-group rc-mb-md">
+                            <label class="rc-form-label">Choose File</label>
+                            <input type="file" name="file" id="fileInput" class="rc-form-input" accept="*/*" required>
+                            <small class="rc-text-secondary">Maximum file size: 50MB</small>
+                        </div>
+
+                        <div class="rc-form-group rc-mb-md">
+                            <label class="rc-form-label">Description (optional)</label>
+                            <textarea name="description" class="rc-form-input" rows="3" maxlength="1000"
+                                     placeholder="Add a description for this file..."></textarea>
+                        </div>
+
+                        <div id="upload-progress" style="display: none;" class="rc-mb-md">
+                            <div class="rc-progress">
+                                <div class="rc-progress-bar" id="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <small class="rc-text-secondary" id="progress-text">Uploading...</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="rc-modal-footer">
+                    <button class="rc-btn rc-btn-secondary" onclick="hideUploadModal()">Cancel</button>
+                    <button class="rc-btn rc-btn-primary" onclick="uploadFile()" id="upload-btn">
+                        <i class="bi bi-upload"></i> Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    // Equipment group toggle
+    function toggleEquipmentGroup(header) {
+        const devices = header.nextElementSibling;
+        const icon = header.querySelector('.toggle-icon');
+        
+        if (devices.style.display === 'none') {
+            devices.style.display = 'block';
+            icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+        } else {
+            devices.style.display = 'none';
+            icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
+        }
+    }
+
+    // Remove device from job
+    function removeDeviceFromJob(jobId, deviceId) {
+        if (confirm('Remove this device from the job?')) {
+            fetch(`/scan/${jobId}/devices/${deviceId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to remove device');
+                }
+            });
+        }
+    }
+
+
+    // Device details modal (reuse from devices page)
+    function showDeviceDetails(deviceID) {
+        // This function can be imported from the devices page if needed
+        window.open('/devices/' + deviceID, '_blank');
+    }
+
+    // ===== FILE ATTACHMENT FUNCTIONS =====
+
+    // Load attachments when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAttachments();
+    });
+
+    // Load attachments for this job
+    function loadAttachments() {
+        const jobID = {{.job.JobID}};
+
+        fetch(`/api/jobs/${jobID}/attachments`)
+            .then(response => response.json())
+            .then(attachments => {
+                displayAttachments(attachments);
+            })
+            .catch(error => {
+                console.error('Error loading attachments:', error);
+                document.getElementById('attachments-list').innerHTML =
+                    '<div class="rc-text-center rc-p-lg rc-text-secondary">Failed to load attachments</div>';
+            });
+    }
+
+    // Display attachments in the UI
+    function displayAttachments(attachments) {
+        const container = document.getElementById('attachments-list');
+
+        if (!attachments || attachments.length === 0) {
+            container.innerHTML = `
+                <div class="rc-text-center rc-p-lg">
+                    <i class="bi bi-paperclip" style="font-size: 3rem; color: var(--text-muted);"></i>
+                    <h4 class="rc-text-muted">No Attachments</h4>
+                    <p class="rc-text-secondary">Upload files to attach them to this job.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="attachment-list">';
+        attachments.forEach(attachment => {
+            const isImage = attachment.isImage;
+            const iconClass = getFileIcon(attachment.mimeType);
+            const uploadDate = new Date(attachment.uploadedAt).toLocaleDateString('de-DE');
+
+            html += `
+                <div class="attachment-item rc-flex rc-flex-between rc-p-md rc-border-bottom">
+                    <div class="attachment-info rc-flex rc-flex-gap-md" style="align-items: center;">
+                        <div class="attachment-icon">
+                            <i class="bi ${iconClass}" style="font-size: 1.5rem; color: var(--primary);"></i>
+                        </div>
+                        <div>
+                            <div class="attachment-name">
+                                <strong>${escapeHtml(attachment.originalFilename)}</strong>
+                                ${isImage ? '<span class="rc-badge rc-badge-info rc-badge-sm">Image</span>' : ''}
+                            </div>
+                            <div class="attachment-meta rc-text-sm rc-text-secondary">
+                                ${attachment.fileSizeFormatted} • ${uploadDate}
+                                ${attachment.uploader ? ` • by ${attachment.uploader.firstName} ${attachment.uploader.lastName}` : ''}
+                            </div>
+                            ${attachment.description ? `<div class="attachment-desc rc-text-sm rc-mt-xs">${escapeHtml(attachment.description)}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="attachment-actions rc-flex rc-flex-gap-xs">
+                        <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="downloadAttachment(${attachment.attachmentID})" title="Download">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="editAttachmentDescription(${attachment.attachmentID}, '${escapeHtml(attachment.description)}')" title="Edit Description">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="deleteAttachment(${attachment.attachmentID}, '${escapeHtml(attachment.originalFilename)}')" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        container.innerHTML = html;
+    }
+
+    // Show upload modal
+    function showUploadModal() {
+        document.getElementById('uploadModal').style.display = 'flex';
+    }
+
+    // Hide upload modal
+    function hideUploadModal() {
+        document.getElementById('uploadModal').style.display = 'none';
+        document.getElementById('uploadForm').reset();
+        document.getElementById('upload-progress').style.display = 'none';
+    }
+
+    // Upload file
+    function uploadFile() {
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const progressDiv = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const uploadBtn = document.getElementById('upload-btn');
+
+        if (!fileInput.files[0]) {
+            alert('Please select a file to upload.');
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        // Show progress
+        progressDiv.style.display = 'block';
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s linear infinite;"></i> Uploading...';
+
+        const xhr = new XMLHttpRequest();
+
+        // Progress tracking
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                progressBar.style.width = percentComplete + '%';
+                progressText.textContent = `Uploading... ${Math.round(percentComplete)}%`;
+            }
+        });
+
+        // Handle completion
+        xhr.addEventListener('load', function() {
+            if (xhr.status === 201) {
+                hideUploadModal();
+                loadAttachments(); // Reload attachments
+                showNotification('File uploaded successfully!', 'success');
+            } else {
+                const response = JSON.parse(xhr.responseText);
+                alert('Upload failed: ' + (response.error || 'Unknown error'));
+            }
+        });
+
+        // Handle errors
+        xhr.addEventListener('error', function() {
+            alert('Upload failed due to network error.');
+        });
+
+        // Reset upload button state
+        xhr.addEventListener('loadend', function() {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="bi bi-upload"></i> Upload';
+            progressDiv.style.display = 'none';
+        });
+
+        xhr.open('POST', '/api/jobs/attachments/upload');
+        xhr.send(formData);
+    }
+
+    // Download attachment
+    function downloadAttachment(attachmentID) {
+        window.open(`/api/jobs/attachments/${attachmentID}/download`, '_blank');
+    }
+
+    // Delete attachment
+    function deleteAttachment(attachmentID, filename) {
+        if (confirm(`Are you sure you want to delete "${filename}"?`)) {
+            fetch(`/api/jobs/attachments/${attachmentID}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    loadAttachments(); // Reload attachments
+                    showNotification('Attachment deleted successfully!', 'success');
+                } else {
+                    alert('Failed to delete attachment: ' + (result.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting attachment:', error);
+                alert('Failed to delete attachment.');
+            });
+        }
+    }
+
+    // Edit attachment description
+    function editAttachmentDescription(attachmentID, currentDescription) {
+        const newDescription = prompt('Edit description:', currentDescription || '');
+
+        if (newDescription !== null && newDescription !== currentDescription) {
+            fetch(`/api/jobs/attachments/${attachmentID}/description`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ description: newDescription })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    loadAttachments(); // Reload attachments
+                    showNotification('Description updated successfully!', 'success');
+                } else {
+                    alert('Failed to update description: ' + (result.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error updating description:', error);
+                alert('Failed to update description.');
+            });
+        }
+    }
+
+    // Helper functions
+    function getFileIcon(mimeType) {
+        if (mimeType.startsWith('image/')) return 'bi-image';
+        if (mimeType.startsWith('video/')) return 'bi-play-circle';
+        if (mimeType.startsWith('audio/')) return 'bi-music-note';
+        if (mimeType.includes('pdf')) return 'bi-file-pdf';
+        if (mimeType.includes('word') || mimeType.includes('document')) return 'bi-file-text';
+        if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'bi-file-spreadsheet';
+        if (mimeType.includes('zip') || mimeType.includes('archive')) return 'bi-file-zip';
+        return 'bi-file-earmark';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showNotification(message, type = 'info') {
+        // Simple notification - you can enhance this based on your notification system
+        const notification = document.createElement('div');
+        notification.className = `rc-notification rc-notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--background-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        `;
+        notification.innerHTML = `<i class="bi bi-check-circle"></i> ${message}`;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+    </script>
+
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js"></script>
+</body>
+</html>

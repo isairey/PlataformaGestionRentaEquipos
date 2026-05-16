@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        try{document.documentElement.setAttribute("data-theme",localStorage.getItem("rc-theme")||"dark")}catch(e){}
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - RentalCore</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="rc-animate-fade-in">
+    {{template "navbar.html" .}}
+
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        <!-- Page Header -->
+        <div class="rc-flex rc-flex-between rc-mb-xl">
+            <div>
+                <h1 class="rc-heading-2">Rental Equipment Analytics</h1>
+                <p class="rc-text">Track performance and usage of externally rented equipment</p>
+            </div>
+            <div class="rc-flex rc-flex-gap-sm">
+                <a href="/rental-equipment" class="rc-btn rc-btn-outline rc-btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back to Equipment
+                </a>
+                <button class="rc-btn rc-btn-primary rc-btn-sm" onclick="exportAnalytics()">
+                    <i class="bi bi-download"></i> Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Key Statistics -->
+        <div class="rc-grid rc-grid-4 rc-mb-lg">
+            <div class="rc-card rc-animate-scale-in">
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-center rc-flex-gap-md">
+                        <div class="rc-icon-circle rc-icon-circle-primary">
+                            <i class="bi bi-boxes"></i>
+                        </div>
+                        <div>
+                            <p class="rc-text-sm rc-text-muted">Total Equipment</p>
+                            <p class="rc-heading-3 rc-mb-0">{{.analytics.TotalEquipmentItems}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rc-card rc-animate-scale-in">
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-center rc-flex-gap-md">
+                        <div class="rc-icon-circle rc-icon-circle-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div>
+                            <p class="rc-text-sm rc-text-muted">Active Equipment</p>
+                            <p class="rc-heading-3 rc-mb-0">{{.analytics.ActiveEquipmentItems}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rc-card rc-animate-scale-in">
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-center rc-flex-gap-md">
+                        <div class="rc-icon-circle rc-icon-circle-warning">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div>
+                            <p class="rc-text-sm rc-text-muted">Suppliers</p>
+                            <p class="rc-heading-3 rc-mb-0">{{.analytics.TotalSuppliersCount}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rc-card rc-animate-scale-in">
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-center rc-flex-gap-md">
+                        <div class="rc-icon-circle rc-icon-circle-info">
+                            <i class="bi bi-currency-euro"></i>
+                        </div>
+                        <div>
+                            <p class="rc-text-sm rc-text-muted">Total Revenue</p>
+                            <p class="rc-heading-3 rc-mb-0">€{{printf "%.2f" .analytics.TotalRentalRevenue}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="rc-grid rc-grid-2 rc-mb-lg">
+            <!-- Monthly Revenue Chart -->
+            <div class="rc-card">
+                <div class="rc-card-header">
+                    <h3 class="rc-heading-4 rc-mb-0">Monthly Revenue Trend</h3>
+                </div>
+                <div class="rc-card-body">
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="monthlyRevenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown Chart -->
+            <div class="rc-card">
+                <div class="rc-card-header">
+                    <h3 class="rc-heading-4 rc-mb-0">Category Breakdown</h3>
+                </div>
+                <div class="rc-card-body">
+                    <div style="position: relative; height: 400px;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Tables Row -->
+        <div class="rc-grid rc-grid-2 rc-mb-lg">
+            <!-- Most Used Equipment -->
+            <div class="rc-card">
+                <div class="rc-card-header">
+                    <h3 class="rc-heading-4 rc-mb-0">Most Used Equipment</h3>
+                </div>
+                <div class="rc-card-body">
+                    <div class="rc-table-responsive">
+                        <table class="rc-table">
+                            <thead>
+                                <tr>
+                                    <th>Equipment</th>
+                                    <th>Usage Count</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .analytics.MostUsedEquipment}}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{.ProductName}}</strong>
+                                            <br><span class="rc-text-sm rc-text-muted">{{.SupplierName}}</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="rc-badge rc-badge-info">{{.UsageCount}} times</span></td>
+                                    <td class="rc-text-right">€{{printf "%.2f" .TotalRevenue}}</td>
+                                </tr>
+                                {{else}}
+                                <tr>
+                                    <td colspan="3" class="rc-text-center rc-text-muted">No usage data available</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Suppliers -->
+            <div class="rc-card">
+                <div class="rc-card-header">
+                    <h3 class="rc-heading-4 rc-mb-0">Top Suppliers</h3>
+                </div>
+                <div class="rc-card-body">
+                    <div class="rc-table-responsive">
+                        <table class="rc-table">
+                            <thead>
+                                <tr>
+                                    <th>Supplier</th>
+                                    <th>Equipment Count</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .analytics.TopSuppliers}}
+                                <tr>
+                                    <td>
+                                        <strong>{{.SupplierName}}</strong>
+                                        <br><span class="rc-text-sm rc-text-muted">{{.UsageCount}} total rentals</span>
+                                    </td>
+                                    <td><span class="rc-badge rc-badge-secondary">{{.EquipmentCount}} items</span></td>
+                                    <td class="rc-text-right">€{{printf "%.2f" .TotalRevenue}}</td>
+                                </tr>
+                                {{else}}
+                                <tr>
+                                    <td colspan="3" class="rc-text-center rc-text-muted">No supplier data available</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Details -->
+        <div class="rc-card">
+            <div class="rc-card-header">
+                <h3 class="rc-heading-4 rc-mb-0">Category Performance</h3>
+            </div>
+            <div class="rc-card-body">
+                <div class="rc-table-responsive">
+                    <table class="rc-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Equipment Count</th>
+                                <th>Usage Count</th>
+                                <th>Total Revenue</th>
+                                <th>Avg. Revenue per Equipment</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range .analytics.CategoryBreakdown}}
+                            <tr>
+                                <td>
+                                    <span class="rc-badge rc-badge-secondary">{{.Category}}</span>
+                                </td>
+                                <td>{{.EquipmentCount}}</td>
+                                <td>{{.UsageCount}}</td>
+                                <td class="rc-text-right">€{{printf "%.2f" .TotalRevenue}}</td>
+                                <td class="rc-text-right">
+                                    {{if gt .EquipmentCount 0}}
+                                    €{{printf "%.2f" .AvgRevenuePerEquipment}}
+                                    {{else}}
+                                    €0.00
+                                    {{end}}
+                                </td>
+                                <td>
+                                    {{if gt .TotalRevenue 1000}}
+                                    <span class="rc-badge rc-badge-success">Excellent</span>
+                                    {{else if gt .TotalRevenue 500}}
+                                    <span class="rc-badge rc-badge-warning">Good</span>
+                                    {{else if gt .TotalRevenue 0}}
+                                    <span class="rc-badge rc-badge-info">Fair</span>
+                                    {{else}}
+                                    <span class="rc-badge rc-badge-secondary">No Data</span>
+                                    {{end}}
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="6" class="rc-text-center rc-text-muted rc-py-xl">
+                                    <i class="bi bi-bar-chart rc-text-4xl rc-text-muted rc-mb-md"></i>
+                                    <p>No category data available. Start renting equipment to see analytics.</p>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/static/js/rental-core-interactions.js"></script>
+    <script>
+        // Chart data from server
+        const monthlyData = {{.analytics.MonthlyRentalRevenue}};
+        const categoryData = {{.analytics.CategoryBreakdown}};
+
+        // Monthly Revenue Chart
+        const monthlyCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyData.map(item => `${item.Month}/${item.Year}`).reverse(),
+                datasets: [{
+                    label: 'Monthly Revenue (€)',
+                    data: monthlyData.map(item => item.TotalRevenue).reverse(),
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '€' + value.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Category Breakdown Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryData.map(item => item.Category),
+                datasets: [{
+                    data: categoryData.map(item => item.TotalRevenue),
+                    backgroundColor: [
+                        '#3B82F6', '#EF4444', '#10B981', '#F59E0B',
+                        '#8B5CF6', '#F97316', '#06B6D4', '#84CC16'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': €' + context.parsed.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function exportAnalytics() {
+            // Create CSV content
+            let csvContent = "Category,Equipment Count,Usage Count,Total Revenue\n";
+
+            {{range .analytics.CategoryBreakdown}}
+            csvContent += "{{.Category}},{{.EquipmentCount}},{{.UsageCount}},{{.TotalRevenue}}\n";
+            {{end}}
+
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'rental_equipment_analytics_' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+
+            showNotification('Analytics report exported successfully', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `rc-notification rc-notification-${type} rc-animate-fade-in`;
+            notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+            notification.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+                <button type="button" class="rc-notification-close" onclick="this.parentElement.remove()">
+                    <i class="bi bi-x"></i>
+                </button>
+            `;
+
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+    </script>
+</body>
+</html>

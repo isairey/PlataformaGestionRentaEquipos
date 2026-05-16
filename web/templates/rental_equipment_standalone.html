@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        try{document.documentElement.setAttribute("data-theme",localStorage.getItem("rc-theme")||"dark")}catch(e){}
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - RentalCore</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="rc-animate-fade-in">
+    {{template "navbar.html" .}}
+
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        <!-- Page Header -->
+        <div class="rc-flex rc-flex-between rc-mb-xl">
+            <div>
+                <h1 class="rc-heading-2">Rental Equipment Management</h1>
+                <p class="rc-text">Manage externally rented equipment for your jobs</p>
+            </div>
+            <div class="rc-flex rc-flex-gap-sm">
+                <a href="/rental-equipment/analytics" class="rc-btn rc-btn-outline rc-btn-sm">
+                    <i class="bi bi-graph-up"></i> Analytics
+                </a>
+                <button class="rc-btn rc-btn-primary rc-btn-sm" onclick="showCreateEquipmentModal()">
+                    <i class="bi bi-plus-lg"></i> Add Equipment
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Search and Filters -->
+        <div class="rc-card rc-mb-lg">
+            <div class="rc-card-body">
+                <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-3 rc-grid-gap-md">
+                    <div class="rc-form-group">
+                        <label class="rc-label">Search Equipment</label>
+                        <div class="rc-input-group">
+                            <span class="rc-input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="rc-input" placeholder="Search by name, supplier, category...">
+                        </div>
+                    </div>
+                    <div class="rc-form-group">
+                        <label class="rc-label">Status Filter</label>
+                        <select id="statusFilter" class="rc-select">
+                            <option value="">All Status</option>
+                            <option value="active">Active Only</option>
+                            <option value="inactive">Inactive Only</option>
+                        </select>
+                    </div>
+                    <div class="rc-form-group">
+                        <label class="rc-label">Supplier Filter</label>
+                        <select id="supplierFilter" class="rc-select">
+                            <option value="">All Suppliers</option>
+                            {{range .uniqueSuppliers}}
+                            <option value="{{.}}">{{.}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Table -->
+        <div class="rc-card">
+            <div class="rc-card-header">
+                <h3 class="rc-card-title">
+                    <i class="bi bi-box-seam"></i> Rental Equipment
+                </h3>
+            </div>
+            <div class="rc-card-body rc-p-0">
+                <div class="rc-table-container">
+                    <table class="rc-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Supplier</th>
+                                <th>Category</th>
+                                <th>Daily Rate</th>
+                                <th>Usage</th>
+                                <th>Revenue</th>
+                                <th>Status</th>
+                                <th class="rc-text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipmentTableBody">
+                            {{range .rentalEquipment}}
+                            <tr data-equipment-id="{{.EquipmentID}}" data-status="{{if .IsActive}}active{{else}}inactive{{end}}"
+                                data-supplier="{{.SupplierName}}" data-search="{{.ProductName}} {{.SupplierName}} {{.Category}}">
+                                <td>
+                                    <div>
+                                        <div class="rc-font-weight-600">{{.ProductName}}</div>
+                                        {{if .Description}}
+                                        <div class="rc-text-sm rc-text-muted">{{truncate .Description 50}}</div>
+                                        {{end}}
+                                    </div>
+                                </td>
+                                <td>{{.SupplierName}}</td>
+                                <td>
+                                    {{if .Category}}
+                                    <span class="rc-badge rc-badge-outline">{{.Category}}</span>
+                                    {{else}}
+                                    <span class="rc-text-muted">Uncategorized</span>
+                                    {{end}}
+                                </td>
+                                <td class="rc-font-mono">€{{printf "%.2f" .RentalPrice}}</td>
+                                <td>
+                                    {{if gt .TotalUsed 0}}
+                                    <span class="rc-badge rc-badge-info">{{.TotalUsed}}x</span>
+                                    {{else}}
+                                    <span class="rc-text-muted">Never used</span>
+                                    {{end}}
+                                </td>
+                                <td class="rc-font-mono">€{{printf "%.2f" .TotalRevenue}}</td>
+                                <td>
+                                    {{if .IsActive}}
+                                    <span class="rc-badge rc-badge-success">Active</span>
+                                    {{else}}
+                                    <span class="rc-badge rc-badge-secondary">Inactive</span>
+                                    {{end}}
+                                </td>
+                                <td class="rc-text-center">
+                                    <div class="rc-btn-group">
+                                        <button class="rc-btn rc-btn-ghost rc-btn-sm" onclick="editEquipment({{.EquipmentID}})" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="rc-btn rc-btn-ghost rc-btn-sm rc-text-danger" onclick="deleteEquipment({{.EquipmentID}})" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="8" class="rc-text-center rc-py-xl">
+                                    <div class="rc-empty-state">
+                                        <i class="bi bi-box-seam rc-text-6xl rc-text-muted"></i>
+                                        <h4 class="rc-heading-4 rc-mt-md rc-mb-sm">No Equipment Found</h4>
+                                        <p class="rc-text-muted rc-mb-lg">No rental equipment found. Add your first equipment to get started.</p>
+                                        <button class="rc-btn rc-btn-primary" onclick="showCreateEquipmentModal()">
+                                            <i class="bi bi-plus-lg"></i> Add First Equipment
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Equipment Modal -->
+    <div id="equipmentModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeEquipmentModal()"></div>
+        <div class="rc-modal-content" style="max-width: 600px;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title" id="equipmentModalTitle">Add New Rental Equipment</h3>
+                <button class="rc-modal-close" onclick="closeEquipmentModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body">
+                <form id="equipmentForm">
+                    <input type="hidden" id="equipmentId" name="equipmentId">
+
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Product Name *</label>
+                            <input type="text" class="rc-input" id="productName" name="productName" required>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Supplier Name *</label>
+                            <input type="text" class="rc-input" id="supplierName" name="supplierName" required>
+                        </div>
+                    </div>
+
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Daily Rental Price (€) *</label>
+                            <div class="rc-input-group">
+                                <span class="rc-input-group-text">€</span>
+                                <input type="number" class="rc-input" id="rentalPrice" name="rentalPrice" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Category</label>
+                            <select class="rc-select" id="category" name="category">
+                                <option value="">Select Category</option>
+                                <option value="Audio">Audio</option>
+                                <option value="Video">Video</option>
+                                <option value="Lighting">Lighting</option>
+                                <option value="Stage Equipment">Stage Equipment</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="rc-form-group">
+                        <label class="rc-label">Description</label>
+                        <textarea class="rc-input" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="rc-form-group">
+                        <label class="rc-label">Notes</label>
+                        <textarea class="rc-input" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+
+                    <div class="rc-form-group">
+                        <label class="rc-checkbox">
+                            <input type="checkbox" id="isActive" name="isActive" checked>
+                            <span class="rc-checkbox-mark"></span>
+                            Active (available for rental)
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="rc-modal-footer">
+                <button type="button" class="rc-btn rc-btn-secondary" onclick="closeEquipmentModal()">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </button>
+                <button type="button" class="rc-btn rc-btn-primary" onclick="saveEquipment()">
+                    <i class="bi bi-check-lg"></i> Save Equipment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/rental-core-design.js?v={{.timestamp}}"></script>
+    <script>
+        let currentEquipmentId = null;
+
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        document.getElementById('statusFilter').addEventListener('change', filterTable);
+        document.getElementById('supplierFilter').addEventListener('change', filterTable);
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const supplierFilter = document.getElementById('supplierFilter').value;
+
+            const rows = document.querySelectorAll('#equipmentTableBody tr[data-equipment-id]');
+
+            rows.forEach(row => {
+                const searchText = row.getAttribute('data-search').toLowerCase();
+                const status = row.getAttribute('data-status');
+                const supplier = row.getAttribute('data-supplier');
+
+                const matchesSearch = searchText.includes(searchTerm);
+                const matchesStatus = !statusFilter || status === statusFilter;
+                const matchesSupplier = !supplierFilter || supplier === supplierFilter;
+
+                row.style.display = matchesSearch && matchesStatus && matchesSupplier ? '' : 'none';
+            });
+        }
+
+        function showCreateEquipmentModal() {
+            currentEquipmentId = null;
+            document.getElementById('equipmentModalTitle').textContent = 'Add New Rental Equipment';
+            document.getElementById('equipmentForm').reset();
+            document.getElementById('isActive').checked = true;
+            document.getElementById('equipmentModal').style.display = 'flex';
+        }
+
+        function closeEquipmentModal() {
+            document.getElementById('equipmentModal').style.display = 'none';
+        }
+
+        function editEquipment(equipmentId) {
+            currentEquipmentId = equipmentId;
+            document.getElementById('equipmentModalTitle').textContent = 'Edit Rental Equipment';
+
+            // This would typically fetch full details via API
+            showToast('Feature will load equipment details from API', 'info');
+            document.getElementById('equipmentModal').style.display = 'flex';
+        }
+
+        function saveEquipment() {
+            const form = document.getElementById('equipmentForm');
+            const formData = new FormData(form);
+
+            const data = {
+                productName: formData.get('productName'),
+                supplierName: formData.get('supplierName'),
+                rentalPrice: parseFloat(formData.get('rentalPrice')),
+                category: formData.get('category'),
+                description: formData.get('description'),
+                notes: formData.get('notes'),
+                isActive: document.getElementById('isActive').checked
+            };
+
+            const url = currentEquipmentId ?
+                `/api/rental-equipment/${currentEquipmentId}` :
+                '/api/rental-equipment';
+            const method = currentEquipmentId ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, 'error');
+                } else {
+                    showToast(data.message, 'success');
+                    closeEquipmentModal();
+                    setTimeout(() => location.reload(), 1500);
+                }
+            })
+            .catch(error => {
+                showToast('Error saving equipment: ' + error.message, 'error');
+            });
+        }
+
+        function deleteEquipment(equipmentId) {
+            if (!confirm('Are you sure you want to delete this rental equipment? This action cannot be undone.')) {
+                return;
+            }
+
+            fetch(`/api/rental-equipment/${equipmentId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, 'error');
+                } else {
+                    showToast(data.message, 'success');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            })
+            .catch(error => {
+                showToast('Error deleting equipment: ' + error.message, 'error');
+            });
+        }
+
+        function showToast(message, type) {
+            // Create notification using RentalCore design system
+            const notification = document.createElement('div');
+            notification.className = `rc-notification rc-notification-${type}`;
+            notification.innerHTML = `
+                <div class="rc-notification-content">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Trigger animation
+            setTimeout(() => notification.classList.add('rc-notification-show'), 100);
+
+            // Remove after delay
+            setTimeout(() => {
+                notification.classList.remove('rc-notification-show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Rental Equipment page loaded');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3653 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        try{document.documentElement.setAttribute("data-theme",localStorage.getItem("rc-theme")||"dark")}catch(e){}
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - RentalCore</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="rc-animate-fade-in">
+    {{template "navbar.html" .}}
+
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+            <!-- Page Header -->
+            <div class="rc-page-header">
+                <h1 class="rc-heading-1">Jobs</h1>
+                <p class="rc-text">Manage your orders and projects</p>
+            </div>
+
+            <!-- Search Card -->
+            <div class="rc-card rc-mb-lg">
+                <div class="rc-card-header">
+                    <h3 class="rc-card-title">
+                        <i class="bi bi-search"></i> Search Jobs
+                    </h3>
+                </div>
+                <div class="rc-card-body">
+                    <!-- ORIGINAL FORM -->
+                    <form method="GET" action="/jobs">
+                        <div class="rc-flex rc-flex-gap-sm" style="align-items: stretch;">
+                            <input type="text" class="rc-input" name="search" placeholder="Search jobs..." value="{{.params.SearchTerm}}" style="max-width: 300px;">
+                            <button type="submit" class="rc-btn rc-btn-primary" style="padding: 0 var(--space-md); min-width: 50px;">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            {{if .params.SearchTerm}}
+                            <a href="/jobs" class="rc-btn rc-btn-outline" style="padding: 0 var(--space-md); min-width: 50px;">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                            {{end}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="rc-flex rc-flex-between rc-mb-lg">
+                <div></div>
+                <button type="button" class="rc-btn rc-btn-primary" onclick="showNewJob()">
+                    <i class="bi bi-plus-lg"></i> New Job
+                </button>
+            </div>
+
+            <!-- Jobs Table -->
+            <div class="rc-card">
+                <div class="rc-card-body">
+                    {{if .jobs}}
+                    <div class="rc-table-responsive">
+                        <table class="rc-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Customer</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th>Devices</th>
+                                    <th>Revenue</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .jobs}}
+                                <tr data-job-id="{{.JobID}}">
+                                    <td><span class="rc-text-mono">{{.JobID}}</span></td>
+                                    <td>{{.Description}}</td>
+                                    <td>{{.CustomerName}}</td>
+                                    <td><span class="rc-text-sm">{{if .StartDate}}{{.StartDate.Format "02.01.2006"}}{{else}}-{{end}}</span></td>
+                                    <td><span class="rc-text-sm">{{if .EndDate}}{{.EndDate.Format "02.01.2006"}}{{else}}-{{end}}</span></td>
+                                    <td><span class="rc-badge rc-badge-secondary">{{.StatusName}}</span></td>
+                                    <td>
+                                        <button type="button" class="device-count-button" onclick="redirectToScan('{{.JobID}}')" title="Click to scan devices for this job">
+                                            {{.DeviceCount}} devices
+                                        </button>
+                                    </td>
+                                    <td><span class="rc-text-mono">€{{printf "%.2f" .TotalRevenue}}</span></td>
+                                    <td>
+                                        <div class="rc-flex rc-flex-gap-xs">
+                                            <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details" onclick="showJobDetails({{.JobID}})">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit Job" onclick="showEditJob({{.JobID}})">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="Delete" onclick="deleteJob({{.JobID}})">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                    {{else}}
+                    <div class="rc-empty-state">
+                        <i class="bi bi-briefcase rc-empty-icon"></i>
+                        <h3 class="rc-heading-3">No jobs found</h3>
+                        <p class="rc-text">Create your first job to get started.</p>
+                        <a href="/jobs/new" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-plus-lg"></i> Create Job
+                        </a>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
+        <div class="rc-container">
+            <div class="rc-flex rc-flex-between" style="align-items: center;">
+                <div class="rc-text-sm" style="color: var(--text-muted);">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - Advanced Equipment Management System
+                </div>
+                <div class="rc-flex" style="gap: var(--space-lg);">
+                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-question-circle"></i> Help
+                    </a>
+                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-envelope"></i> Contact
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Job Details Modal -->
+    <div id="jobDetailsModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeJobModal()"></div>
+        <div class="rc-modal-content" id="jobDetailsModalContent" style="max-width: 900px !important; width: 90vw !important;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title" id="jobDetailsModalTitle">
+                    <i class="bi bi-briefcase"></i> Job Details
+                </h3>
+                <button class="rc-modal-close" onclick="closeJobModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body" id="jobDetailsContent">
+                <div class="rc-text-center rc-py-xl">
+                    <div class="rc-spinner"></div>
+                    <p class="rc-text-muted rc-mt-md">Loading job details...</p>
+                </div>
+            </div>
+            <div class="rc-modal-body" id="jobDevicesContent" style="display: none;">
+                <div class="rc-flex rc-flex-between rc-items-center rc-mb-lg">
+                    <button type="button" class="rc-btn rc-btn-secondary" onclick="returnToJobSummary()">
+                        <i class="bi bi-arrow-left"></i> Back to Job Summary
+                    </button>
+                    <h4 class="rc-text-lg rc-font-semibold">Device Overview</h4>
+                </div>
+                <div id="jobDevicesOverview">
+                    <div class="rc-text-center rc-py-xl">
+                        <div class="rc-spinner"></div>
+                        <p class="rc-text-muted rc-mt-md">Loading devices...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Edit Modal -->
+    <div id="jobEditModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeEditJobModal()"></div>
+        <div class="rc-modal-content" style="max-width: 800px;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title">
+                    <i class="bi bi-pencil"></i> Edit Job
+                </h3>
+                <button class="rc-modal-close" onclick="closeEditJobModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body" id="jobEditContent">
+                <div class="rc-text-center rc-py-xl">
+                    <div class="rc-spinner"></div>
+                    <p class="rc-text-muted rc-mt-md">Loading job form...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Job Modal -->
+    <div id="newJobModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeNewJobModal()"></div>
+        <div class="rc-modal-content" style="max-width: 800px;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title">
+                    <i class="bi bi-plus-lg"></i> New Job
+                </h3>
+                <button class="rc-modal-close" onclick="closeNewJobModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body" id="newJobContent">
+                <div class="rc-text-center rc-py-xl">
+                    <div class="rc-spinner"></div>
+                    <p class="rc-text-muted rc-mt-md">Loading job form...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js?v={{.timestamp}}"></script>
+    <script>
+    // Job Details Modal
+    function showJobDetails(jobID) {
+        const modal = document.getElementById('jobDetailsModal');
+        const content = document.getElementById('jobDetailsContent');
+        
+        // Store current job ID in modal for revenue updates
+        modal.setAttribute('data-current-job-id', jobID);
+        
+        // Show modal with loading state
+        modal.style.display = 'flex';
+        content.innerHTML = `
+            <div class="rc-text-center rc-py-xl">
+                <div class="rc-spinner"></div>
+                <p class="rc-text-muted rc-mt-md">Loading job details...</p>
+            </div>
+        `;
+        
+        // Fetch job details
+        fetch('/api/v1/jobs/' + jobID)
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(job => {
+                console.log('Job data received:', job);
+                const jobData = job.job || job;
+                content.innerHTML = `
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Job ID</label>
+                            <div class="rc-badge rc-badge-primary">${jobData.jobID}</div>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Status</label>
+                            <div class="rc-badge rc-badge-outline">${jobData.status && jobData.status.status ? jobData.status.status : 'Unknown'}</div>
+                        </div>
+                        <div class="rc-form-group rc-grid-span-2">
+                            <label class="rc-label">Description</label>
+                            <div>${jobData.description || 'No description'}</div>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Customer</label>
+                            <div>${jobData.customer ? (jobData.customer.companyname || (jobData.customer.firstname && jobData.customer.lastname ? jobData.customer.firstname + ' ' + jobData.customer.lastname : 'No Name')) : 'Unknown Customer'}</div>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Revenue</label>
+                            <div class="rc-text-lg">€${(jobData.revenue || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Devices</label>
+                            <div>
+                                <button type="button" class="job-device-count-button" onclick="expandToDeviceView(${jobData.jobID})" title="Click to view devices">
+                                    ${jobData.device_count || 0}
+                                </button>
+                            </div>
+                        </div>
+                        ${jobData.startDate ? '<div class="rc-form-group"><label class="rc-label">Start Date</label><div><i class="bi bi-calendar"></i> ' + new Date(jobData.startDate).toLocaleDateString() + '</div></div>' : ''}
+                        ${jobData.endDate ? '<div class="rc-form-group"><label class="rc-label">End Date</label><div><i class="bi bi-calendar"></i> ' + new Date(jobData.endDate).toLocaleDateString() + '</div></div>' : ''}
+                        ${jobData.discount > 0 ? '<div class="rc-form-group"><label class="rc-label">Discount</label><div>' + jobData.discount + ' ' + (jobData.discount_type === 'percent' ? '%' : '€') + '</div></div>' : ''}
+                        ${jobData.finalRevenue ? '<div class="rc-form-group"><label class="rc-label">Final Revenue</label><div class="rc-text-lg">€' + jobData.finalRevenue.toFixed(2) + '</div></div>' : ''}
+                    </div>
+
+                    <!-- File Attachments Section -->
+                    <div class="rc-mt-lg">
+                        <div class="rc-flex rc-flex-between rc-flex-align-center rc-mb-md">
+                            <h4 class="rc-text-lg rc-font-semibold">
+                                <i class="bi bi-paperclip"></i> File Attachments
+                            </h4>
+                            <span class="rc-badge rc-badge-outline" id="attachmentCount">Loading...</span>
+                        </div>
+                        <div id="jobDetailsAttachmentsList" class="rc-card" style="background: var(--surface-1); border: 1px solid var(--surface-3);">
+                            <div class="rc-card-body">
+                                <div class="rc-text-center rc-py-md">
+                                    <div class="rc-spinner rc-spinner-sm"></div>
+                                    <p class="rc-text-muted rc-text-sm rc-mt-sm">Loading attachments...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rc-flex rc-flex-end rc-mt-lg">
+                        <button onclick="showEditJob(${jobData.jobID})" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-pencil"></i> Edit Job
+                        </button>
+                    </div>
+                `;
+
+                // Load file attachments after job details are loaded
+                loadJobDetailsAttachments(jobData.jobID);
+            })
+            .catch(error => {
+                content.innerHTML = `
+                    <div class="rc-alert rc-alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error loading job details: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function closeJobModal() {
+        document.getElementById('jobDetailsModal').style.display = 'none';
+        // Reset modal to job summary view
+        returnToJobSummary();
+    }
+
+    let currentJobID = null;
+
+    function expandToDeviceView(jobID) {
+        currentJobID = jobID;
+        
+        // Hide job summary, show device overview
+        document.getElementById('jobDetailsContent').style.display = 'none';
+        document.getElementById('jobDevicesContent').style.display = 'block';
+        
+        // Update modal title
+        document.getElementById('jobDetailsModalTitle').innerHTML = '<i class="bi bi-cpu"></i> Device Overview - Job #' + jobID;
+        
+        // Make modal larger for device overview
+        document.getElementById('jobDetailsModalContent').style.maxWidth = '1400px';
+        
+        // Load device data
+        loadJobDevices(jobID);
+    }
+
+    function returnToJobSummary() {
+        // Show job summary, hide device overview  
+        document.getElementById('jobDetailsContent').style.display = 'block';
+        document.getElementById('jobDevicesContent').style.display = 'none';
+        
+        // Reset modal title
+        document.getElementById('jobDetailsModalTitle').innerHTML = '<i class="bi bi-briefcase"></i> Job Details';
+        
+        // Reset modal size
+        document.getElementById('jobDetailsModalContent').style.maxWidth = '';
+    }
+
+    function loadJobDevices(jobID) {
+        const content = document.getElementById('jobDevicesOverview');
+        
+        // Show loading state
+        content.innerHTML = `
+            <div class="rc-text-center rc-py-xl">
+                <div class="rc-spinner"></div>
+                <p class="rc-text-muted rc-mt-md">Loading devices...</p>
+            </div>
+        `;
+        
+        // Fetch job devices
+        fetch('/api/v1/jobs/' + jobID + '/devices')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Devices API response:', data);
+                const devices = data.devices || data || [];
+                displayJobDevicesInModal(devices, jobID);
+            })
+            .catch(error => {
+                content.innerHTML = `
+                    <div class="rc-alert rc-alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error loading devices: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function displayJobDevicesInModal(devices, jobID) {
+        console.log('displayJobDevicesInModal called with devices:', devices);
+        const categories = {
+            'Sound': [],
+            'Light': [],
+            'Effect': [],
+            'Stage': [],
+            'Other': []
+        };
+
+        // Group devices by category using categoryID and subcategoryID
+        devices.forEach(device => {
+            let category = 'Other';
+            if (device.device && device.device.product) {
+                const product = device.device.product;
+                const categoryID = product.categoryID;
+                const subcategoryID = product.subcategoryID;
+                
+                // Debug logging for categorization
+                console.log(`Device ${device.device.deviceID}: CategoryID=${categoryID}, SubcategoryID=${subcategoryID}`);
+                
+                // Categorize based on categoryID and subcategoryID patterns
+                if (categoryID === 1001) { // Sound category
+                    category = 'Sound';
+                } else if (categoryID === 1002) { // Light category  
+                    category = 'Light';
+                } else if (categoryID === 1003) { // Stage category
+                    category = 'Stage';
+                } else if (categoryID === 1004) { // Effect category
+                    category = 'Effect';
+                } else if (subcategoryID) {
+                    // Fallback: categorize based on subcategory prefix
+                    const subcat = subcategoryID.toLowerCase();
+                    if (subcat.startsWith('snd') || subcat.includes('mic') || subcat.includes('mix') || subcat.includes('amp')) {
+                        category = 'Sound';
+                    } else if (subcat.startsWith('lgt') || subcat.includes('light') || subcat.includes('led')) {
+                        category = 'Light';
+                    } else if (subcat.startsWith('stg') || subcat.includes('stage') || subcat.includes('lift') || subcat.includes('lft')) {
+                        category = 'Stage';
+                    } else if (subcat.startsWith('efx') || subcat.includes('effect') || subcat.includes('fog') || subcat.includes('smoke')) {
+                        category = 'Effect';
+                    }
+                }
+            }
+            console.log(`Device ${device.device?.deviceID} categorized as: ${category}`);
+            categories[category].push(device);
+        });
+
+        let html = '';
+        Object.entries(categories).forEach(([categoryName, categoryDevices]) => {
+            if (categoryDevices.length > 0) {
+                html += `
+                    <div class="rc-card rc-mb-md">
+                        <div class="rc-card-header">
+                            <h4 class="rc-card-title">
+                                <i class="bi bi-${getCategoryIcon(categoryName)}"></i>
+                                ${categoryName} (${categoryDevices.length})
+                            </h4>
+                        </div>
+                        <div class="rc-card-body">
+                `;
+                
+                categoryDevices.forEach(device => {
+                    const deviceName = device.device?.product?.name || device.device?.deviceID || 'Unknown Device';
+                    // Calculate effective price: custom_price if exists and > 0, otherwise product price
+                    const customPrice = device.custom_price;
+                    // Fix: JSON field is "itemcostperday" not "itemCostPerDay"
+                    const productPrice = device.device?.product?.itemcostperday || device.device?.product?.itemCostPerDay || 0;
+                    const price = (customPrice && customPrice > 0) ? customPrice : productPrice;
+                    
+                    // Debug logging for price calculation
+                    console.log(`Device ${device.device?.deviceID}: custom_price=${customPrice}, itemcostperday=${productPrice}, effective_price=${price}`, device);
+                    html += `
+                        <div class="device-item rc-flex rc-flex-between rc-flex-items-center rc-p-sm rc-mb-xs" style="border: 1px solid var(--surface-3); border-radius: var(--radius-sm);">
+                            <div>
+                                <strong>${deviceName}</strong>
+                                <br><small class="rc-text-muted">${device.device?.deviceID}</small>
+                            </div>
+                            <div class="rc-flex rc-flex-items-center rc-flex-gap-sm">
+                                <input type="number" 
+                                       value="${price.toFixed(2)}" 
+                                       class="device-price-input rc-input rc-input-sm" 
+                                       style="width: 100px;" 
+                                       step="0.01"
+                                       onchange="updateDevicePrice(${jobID}, '${device.device?.deviceID}', this.value)"
+                                       placeholder="0.00">
+                                <span class="rc-text-sm">€</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (html === '') {
+            html = `
+                <div class="rc-empty-state">
+                    <i class="bi bi-cpu rc-empty-icon"></i>
+                    <h3 class="rc-heading-3">No devices assigned</h3>
+                    <p class="rc-text">This job has no devices assigned yet.</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('jobDevicesOverview').innerHTML = html;
+    }
+
+    // Job Edit Modal
+    function showEditJob(jobID) {
+        // Close details modal if open
+        closeJobModal();
+        
+        const modal = document.getElementById('jobEditModal');
+        const content = document.getElementById('jobEditContent');
+        
+        // Show modal with loading state
+        modal.style.display = 'flex';
+        content.innerHTML = `
+            <div class="rc-text-center rc-py-xl">
+                <div class="rc-spinner"></div>
+                <p class="rc-text-muted rc-mt-md">Loading job form...</p>
+            </div>
+        `;
+        
+        // Reset edit modal device state
+        editSelectedDevices.clear();
+        editDeviceTreeData = null;
+        
+        // Fetch job data for editing
+        Promise.all([
+            fetch('/api/v1/jobs/' + jobID),
+            fetch('/api/v1/customers'),
+            fetch('/statuses'),
+            fetch('/api/v1/jobs/' + jobID + '/devices')
+        ])
+        .then(responses => {
+            // Check if all responses are ok before parsing JSON
+            responses.forEach(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            });
+            return Promise.all(responses.map(r => r.json()));
+        })
+        .then(([jobResponse, customersResponse, statusResponse, devicesResponse]) => {
+            const job = jobResponse.job || jobResponse;
+            const customers = customersResponse.customers || customersResponse;
+            const statuses = statusResponse.statuses || statusResponse;
+            const existingDevices = devicesResponse.devices || [];
+            
+            // Load existing devices into selected set
+            existingDevices.forEach(device => {
+                if (device.device && device.device.deviceID) {
+                    editSelectedDevices.add(device.device.deviceID);
+                } else if (device.deviceID) {
+                    editSelectedDevices.add(device.deviceID);
+                }
+            });
+            
+            console.log('Job edit data:', {job, customers, statuses});
+            
+            content.innerHTML = `
+                <form id="editJobForm">
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Job ID *</label>
+                            <input type="text" class="rc-input" value="${job.jobID}" readonly style="background: var(--surface-2);">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Customer *</label>
+                            <select class="rc-select" name="customerID" required>
+                                ${customers.map(customer => 
+                                    '<option value="' + customer.customerID + '" ' + (customer.customerID === job.customerID ? 'selected' : '') + '>' +
+                                        (customer.companyname || (customer.firstname + ' ' + customer.lastname)) +
+                                    '</option>'
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Status *</label>
+                            <select class="rc-select" name="statusID" required>
+                                ${statuses.map(status => 
+                                    '<option value="' + status.statusID + '" ' + (status.statusID === job.statusID ? 'selected' : '') + '>' +
+                                        status.status +
+                                    '</option>'
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Revenue (€)</label>
+                            <input type="number" class="rc-input" name="revenue" value="${job.revenue || ''}" step="0.01" min="0">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Start Date *</label>
+                            <input type="date" class="rc-input" name="startDate" value="${job.startDate ? job.startDate.split('T')[0] : ''}" required>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">End Date *</label>
+                            <input type="date" class="rc-input" name="endDate" value="${job.endDate ? job.endDate.split('T')[0] : ''}" required>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Discount</label>
+                            <input type="number" class="rc-input" name="discount" value="${job.discount || ''}" step="0.01" min="0">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Discount Type</label>
+                            <select class="rc-select" name="discount_type">
+                                <option value="amount" ${job.discount_type === 'amount' ? 'selected' : ''}>Amount (€)</option>
+                                <option value="percent" ${job.discount_type === 'percent' ? 'selected' : ''}>Percentage (%)</option>
+                            </select>
+                        </div>
+                        <div class="rc-form-group rc-grid-span-2">
+                            <label class="rc-label">Description</label>
+                            <textarea class="rc-textarea" name="description" rows="3">${job.description || ''}</textarea>
+                        </div>
+                    </div>
+                    
+                                <!-- Rental Equipment Section -->
+                                <div id="editRentalEquipmentContainer" class="rc-mt-lg">
+                                    <div class="rc-flex rc-flex-between rc-mb-md">
+                                        <h5 class="rc-heading-5">Rental Equipment</h5>
+                                        <div class="rc-flex rc-flex-gap-sm">
+                                            <button type="button" onclick="showManualRentalEntry(${job.jobID})" class="rc-btn rc-btn-success rc-btn-sm" title="Add new rental item">
+                                                <i class="bi bi-plus-lg"></i> Manual Entry
+                                            </button>
+                                            <button type="button" onclick="showRentalSelection(${job.jobID})" class="rc-btn rc-btn-outline rc-btn-sm" title="Select from existing rental equipment">
+                                                <i class="bi bi-collection"></i> Select Existing
+                                            </button>
+                                            <button type="button" onclick="refreshJobRentalEquipment(${job.jobID})" class="rc-btn rc-btn-outline rc-btn-sm" title="Refresh rental equipment">
+                                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="editRentalEquipmentList">
+                                        <!-- Rental equipment will appear here -->
+                                    </div>
+                                </div>
+
+                                <!-- File Attachments Section -->
+                                <div id="editFileAttachmentsContainer" class="rc-mt-lg">
+                                    <div class="rc-flex rc-flex-between rc-mb-md">
+                                        <h5 class="rc-heading-5">
+                                            <i class="bi bi-paperclip"></i> File Attachments
+                                        </h5>
+                                        <button type="button" onclick="toggleEditAttachments()" class="rc-btn rc-btn-outline rc-btn-sm" id="toggleEditAttachmentsBtn">
+                                            <i class="bi bi-eye"></i> Show Files
+                                        </button>
+                                    </div>
+                                    <div id="editAttachmentsSection" style="display: none;">
+                                        <div class="file-upload-area" style="border: 2px dashed var(--surface-3); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; margin-bottom: 16px;"
+                                             onclick="document.getElementById('editJobFileInput').click();">
+                                            <i class="bi bi-cloud-upload" style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 6px;"></i>
+                                            <p style="margin: 0; color: var(--text-muted); font-size: 14px;">Click to select files or drag and drop</p>
+                                            <small style="color: var(--text-muted); font-size: 12px;">Max 50MB per file</small>
+                                        </div>
+                                        <input type="file" id="editJobFileInput" multiple accept="*/*" style="display: none;" onchange="handleEditJobFileSelection(this)">
+
+                                        <div id="editSelectedFilesList" style="display: none;">
+                                            <h6 style="margin-bottom: 8px; font-size: 14px;">Selected Files:</h6>
+                                            <div id="editSelectedFilesContainer"></div>
+                                            <button type="button" class="rc-btn rc-btn-primary rc-btn-sm" onclick="uploadEditJobFiles()" style="margin-top: 8px;">
+                                                <i class="bi bi-upload"></i> Upload Files
+                                            </button>
+                                        </div>
+
+                                        <div id="editCurrentAttachments" style="margin-top: 16px;">
+                                            <h6 style="margin-bottom: 8px; font-size: 14px;">Current Attachments:</h6>
+                                            <div id="editAttachmentsList">Loading...</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Device Tree Toggle Section -->
+                                <div class="rc-flex rc-flex-between rc-flex-align-center rc-mt-lg rc-mb-md">
+                                    <h5 class="rc-heading-5">Device Management</h5>
+                                    <button type="button" onclick="toggleEditDeviceTree()" class="rc-btn rc-btn-outline rc-btn-sm" id="toggleEditDeviceTreeBtn">
+                                        <i class="bi bi-eye"></i> Show Device Tree
+                                    </button>
+                                </div>
+
+                                <div id="editDeviceManagementSection" style="display: none;">
+                                    <div class="rc-card">
+                                        <div class="rc-card-header">
+                                            <div class="rc-flex rc-flex-between">
+                                                <h4 class="rc-card-title">Available Devices</h4>
+                                                <div class="rc-flex rc-flex-gap-sm">
+                                                    <button type="button" onclick="loadEditDeviceTree(${job.jobID})" class="rc-btn rc-btn-outline rc-btn-sm" id="refreshEditDeviceTree">
+                                                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                                                    </button>
+                                                    <button type="button" onclick="expandAllEditTreeNodes()" class="rc-btn rc-btn-outline rc-btn-sm" title="Expand All Categories">
+                                                        <i class="bi bi-arrows-expand"></i> Expand All
+                                                    </button>
+                                                    <button type="button" onclick="collapseAllEditTreeNodes()" class="rc-btn rc-btn-outline rc-btn-sm" title="Collapse All Categories">
+                                                        <i class="bi bi-arrows-collapse"></i> Collapse All
+                                                    </button>
+                                                    <button type="button" id="toggleEditTreeView" class="rc-btn rc-btn-outline rc-btn-sm">
+                                                        <i class="bi bi-diagram-3"></i> Tree View
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="rc-card-body">
+                                            <div id="editDeviceSelectionContainer">
+                                                <div id="loadingEditDevices" class="rc-flex rc-flex-center rc-py-xl">
+                                                    <i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite; margin-right: var(--space-sm);"></i>
+                                                    Loading available devices...
+                                                </div>
+
+                                                <div id="editDeviceTreeContainer" style="display: none;">
+                                                    <!-- Tree view will be loaded here -->
+                                                </div>
+
+                                                <!-- Currently Assigned Devices Section -->
+                                                <div id="editAssignedDevicesContainer" class="rc-mt-lg">
+                                                    <div class="rc-flex rc-flex-between rc-mb-md">
+                                                        <h5 class="rc-heading-5">Currently Assigned Devices</h5>
+                                                        <button type="button" onclick="refreshEditAssignedDevices(${job.jobID})" class="rc-btn rc-btn-outline rc-btn-sm" title="Refresh assigned devices">
+                                                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                                                        </button>
+                                                    </div>
+                                                    <div id="editAssignedDevicesList">
+                                                        <!-- Assigned devices with price editing will appear here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="editSelectedDevicesContainer" class="rc-mt-lg">
+                                        <h5>Additional Device Selection</h5>
+                                        <p class="rc-text-sm rc-text-secondary rc-mb-sm">Select additional devices to add to this job:</p>
+                                        <div id="editSelectedDevicesList" class="rc-flex rc-flex-wrap rc-flex-gap-sm">
+                                            <!-- Selected devices will appear here as badges -->
+                                        </div>
+                                        <input type="hidden" name="selected_devices" id="editSelectedDevicesInput" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rc-flex rc-flex-between">
+                        <button type="button" onclick="closeEditJobModal()" class="rc-btn rc-btn-secondary">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </button>
+                        <button type="submit" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-check-lg"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            `;
+            
+            // Handle form submission
+            document.getElementById('editJobForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveJob(jobID, new FormData(this));
+            });
+
+            // Add event listeners for date changes in edit modal
+            const startDateInput = document.querySelector('#editJobForm input[name="startDate"]');
+            const endDateInput = document.querySelector('#editJobForm input[name="endDate"]');
+            
+            if (startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', () => loadEditDeviceTree(jobID));
+                endDateInput.addEventListener('change', () => loadEditDeviceTree(jobID));
+            }
+            
+            // Add refresh button listener
+            document.getElementById('refreshEditDeviceTree').addEventListener('click', () => loadEditDeviceTree(jobID));
+            
+            // Load device tree if dates are available
+            if (startDateInput.value && endDateInput.value) {
+                loadEditDeviceTree(jobID);
+            }
+            
+            // Update selected devices display immediately
+            updateEditSelectedDevicesDisplay();
+
+            // Load and display currently assigned devices
+            loadEditAssignedDevices(job.jobID, existingDevices);
+
+            // Load and display rental equipment for this job
+            refreshJobRentalEquipment(job.jobID);
+        })
+        .catch(error => {
+            content.innerHTML = `
+                <div class="rc-alert rc-alert-error">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Error loading job form: ${error.message}
+                </div>
+            `;
+        });
+    }
+
+    function closeEditJobModal() {
+        document.getElementById('jobEditModal').style.display = 'none';
+    }
+
+    function saveJob(jobID, formData) {
+        const submitBtn = document.querySelector('#editJobForm button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+        submitBtn.disabled = true;
+        
+        // Convert FormData to JSON
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            if (key.includes('Date')) {
+                data[key] = value ? value : null;
+            } else if (key === 'revenue' || key === 'discount') {
+                data[key] = value ? parseFloat(value) : 0;
+            } else if (key === 'customerID' || key === 'statusID') {
+                data[key] = value ? parseInt(value) : null;
+            } else {
+                data[key] = value || null;
+            }
+        }
+        
+        console.log('Saving job data:', data);
+        
+        fetch('/api/v1/jobs/' + jobID, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Success - close modal and reload page
+            closeEditJobModal();
+            window.location.reload();
+        })
+        .catch(error => {
+            // Restore button and show error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            alert('Error saving job: ' + error.message);
+        });
+    }
+
+    function deleteJob(jobID) {
+        if (confirm('Are you sure you want to delete this job?')) {
+            fetch('/api/v1/jobs/' + jobID, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                window.location.reload();
+            })
+            .catch(error => {
+                alert('Error deleting job: ' + error.message);
+            });
+        }
+    }
+
+    // Live end date calculation function
+    function setupLiveEndDateCalculation(startInput, endInput) {
+        if (!startInput || !endInput) return;
+        
+        startInput.addEventListener('change', function() {
+            const startDate = new Date(this.value);
+            if (isNaN(startDate.getTime())) return; // Invalid date
+            
+            // Calculate next day
+            const nextDay = new Date(startDate);
+            nextDay.setDate(startDate.getDate() + 1);
+            
+            // Format as YYYY-MM-DD
+            const year = nextDay.getFullYear();
+            const month = String(nextDay.getMonth() + 1).padStart(2, '0');
+            const day = String(nextDay.getDate()).padStart(2, '0');
+            const nextDayString = `${year}-${month}-${day}`;
+            
+            // Set end date
+            endInput.value = nextDayString;
+            
+            console.log('DEBUG: Live calculation - Start date changed to:', this.value, '→ End date set to:', nextDayString);
+        });
+    }
+
+    // Redirect to scan page for specific job
+    function redirectToScan(jobID) {
+        window.location.href = `/scan/${jobID}`;
+    }
+
+    // New Job Modal
+    function showNewJob() {
+        const modal = document.getElementById('newJobModal');
+        const content = document.getElementById('newJobContent');
+        
+        // Show modal with loading state
+        modal.style.display = 'flex';
+        content.innerHTML = `
+            <div class="rc-text-center rc-py-xl">
+                <div class="rc-spinner"></div>
+                <p class="rc-text-muted rc-mt-md">Loading job form...</p>
+            </div>
+        `;
+        
+        // Fetch new job form
+        fetch('/jobs/new')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Extract just the form content from the HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const form = doc.querySelector('form');
+                
+                if (form) {
+                    content.innerHTML = form.outerHTML;
+                    
+                    // Update form action to handle modal submission
+                    const modalForm = content.querySelector('form');
+                    if (modalForm) {
+                        modalForm.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            submitNewJobForm(new FormData(this));
+                        });
+                        
+                        // Initialize default dates for the modal form
+                        console.log('DEBUG: Setting up auto dates for modal form');
+                        setTimeout(function() {
+                            const startInput = document.querySelector('#newJobModal input[name="start_date"]');
+                            const endInput = document.querySelector('#newJobModal input[name="end_date"]');
+                            
+                            console.log('DEBUG: Modal date inputs found:', {
+                                startInput: !!startInput,
+                                endInput: !!endInput,
+                                startValue: startInput?.value,
+                                endValue: endInput?.value
+                            });
+                            
+                            if (startInput && endInput) {
+                                // Always set up live calculation
+                                setupLiveEndDateCalculation(startInput, endInput);
+                                
+                                // Only set default dates if both fields are empty
+                                if (!startInput.value && !endInput.value) {
+                                const today = new Date();
+                                const currentYear = today.getFullYear();
+                                const month = String(today.getMonth() + 1).padStart(2, '0');
+                                const day = String(today.getDate()).padStart(2, '0');
+                                
+                                // Set start date to today
+                                const todayString = `${currentYear}-${month}-${day}`;
+                                startInput.value = todayString;
+                                
+                                // Set end date to tomorrow
+                                const tomorrow = new Date(today);
+                                tomorrow.setDate(today.getDate() + 1);
+                                const tomorrowMonth = String(tomorrow.getMonth() + 1).padStart(2, '0');
+                                const tomorrowDay = String(tomorrow.getDate()).padStart(2, '0');
+                                const tomorrowString = `${tomorrow.getFullYear()}-${tomorrowMonth}-${tomorrowDay}`;
+                                endInput.value = tomorrowString;
+                                
+                                console.log('DEBUG: Modal - Set default dates:', todayString, 'to', tomorrowString);
+                                }
+                            }
+                        }, 100);
+                    }
+                } else {
+                    content.innerHTML = `
+                        <div class="rc-alert rc-alert-error">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Could not load job form
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                content.innerHTML = `
+                    <div class="rc-alert rc-alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error loading job form: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function closeNewJobModal() {
+        document.getElementById('newJobModal').style.display = 'none';
+    }
+
+    function submitNewJobForm(formData) {
+        const submitBtn = document.querySelector('#newJobModal button[type="submit"]');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        
+        // Show loading state
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
+            submitBtn.disabled = true;
+        }
+        
+        fetch('/jobs', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.text();
+        })
+        .then(result => {
+            // Success - close modal and reload page
+            closeNewJobModal();
+            window.location.reload();
+        })
+        .catch(error => {
+            // Restore button and show error
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+            
+            alert('Error creating job: ' + error.message);
+        });
+    }
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeJobModal();
+            closeEditJobModal();
+            closeNewJobModal();
+        }
+    });
+
+    // Edit Modal Device Tree Functions
+    let editSelectedDevices = new Set();
+    let editDeviceTreeData = null;
+
+    function loadEditDeviceTree(jobID) {
+        const startDate = document.querySelector('#editJobForm input[name="startDate"]').value;
+        const endDate = document.querySelector('#editJobForm input[name="endDate"]').value;
+        
+        if (!startDate || !endDate) {
+            document.getElementById('loadingEditDevices').innerHTML = '<i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite; margin-right: var(--space-sm);"></i> Please select start and end dates to load available devices';
+            document.getElementById('editDeviceTreeContainer').style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('loadingEditDevices').innerHTML = '<i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite; margin-right: var(--space-sm);"></i> Loading available devices...';
+        document.getElementById('editDeviceTreeContainer').style.display = 'none';
+        
+        const url = `/api/v1/devices/tree/availability?start_date=${startDate}&end_date=${endDate}&job_id=${jobID}`;
+        
+        fetch(url, {
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            editDeviceTreeData = data.treeData;
+            renderEditDeviceTree(editDeviceTreeData);
+            document.getElementById('loadingEditDevices').style.display = 'none';
+            document.getElementById('editDeviceTreeContainer').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error loading device tree:', error);
+            document.getElementById('loadingEditDevices').innerHTML = '<div style="color: var(--error);"><i class="bi bi-exclamation-triangle"></i> Error loading devices: ' + error.message + '</div>';
+            document.getElementById('editDeviceTreeContainer').style.display = 'none';
+        });
+    }
+
+    function renderEditDeviceTree(treeData) {
+        const container = document.getElementById('editDeviceTreeContainer');
+        
+        if (!treeData || treeData.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: var(--space-xl); color: var(--text-muted);">No devices found</div>';
+            return;
+        }
+        
+        let html = '<div class="device-tree-container">';
+        
+        treeData.forEach(category => {
+            html += renderEditCategoryHtml(category);
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function renderEditCategoryHtml(category) {
+        let html = `
+            <div class="tree-category">
+                <div class="tree-category-header" onclick="toggleEditTreeNode('edit-category-${category.id}')">
+                    <i class="bi bi-chevron-right tree-chevron" id="chevron-edit-category-${category.id}"></i>
+                    <i class="bi bi-folder2 tree-icon category-icon"></i>
+                    <span class="tree-title">${category.name}</span>
+                    <span class="tree-count">${category.device_count} devices</span>
+                </div>
+                <div class="tree-content" id="edit-category-${category.id}" style="display: none;">
+        `;
+        
+        if (category.direct_devices && category.direct_devices.length > 0) {
+            category.direct_devices.forEach(device => {
+                html += renderEditDeviceHtml(device);
+            });
+        }
+        
+        if (category.subcategories && category.subcategories.length > 0) {
+            category.subcategories.forEach(subcategory => {
+                html += renderEditSubcategoryHtml(subcategory);
+            });
+        }
+        
+        html += '</div></div>';
+        return html;
+    }
+
+    function renderEditSubcategoryHtml(subcategory) {
+        let html = `
+            <div class="tree-subcategory">
+                <div class="tree-subcategory-header" onclick="toggleEditTreeNode('edit-subcategory-${subcategory.id}')">
+                    <i class="bi bi-chevron-right tree-chevron" id="chevron-edit-subcategory-${subcategory.id}"></i>
+                    <i class="bi bi-folder tree-icon subcategory-icon"></i>
+                    <span class="tree-title">${subcategory.name}</span>
+                    <span class="tree-count">${subcategory.device_count} devices</span>
+                </div>
+                <div class="tree-content" id="edit-subcategory-${subcategory.id}" style="display: none;">
+        `;
+        
+        if (subcategory.direct_devices && subcategory.direct_devices.length > 0) {
+            subcategory.direct_devices.forEach(device => {
+                html += renderEditDeviceHtml(device);
+            });
+        }
+        
+        if (subcategory.subbiercategories && subcategory.subbiercategories.length > 0) {
+            subcategory.subbiercategories.forEach(subbiercategory => {
+                html += renderEditSubbiercategoryHtml(subbiercategory);
+            });
+        }
+        
+        html += '</div></div>';
+        return html;
+    }
+
+    function renderEditSubbiercategoryHtml(subbiercategory) {
+        let html = `
+            <div class="tree-subbiercategory">
+                <div class="tree-subbiercategory-header" onclick="toggleEditTreeNode('edit-subbiercategory-${subbiercategory.id}')">
+                    <i class="bi bi-chevron-right tree-chevron" id="chevron-edit-subbiercategory-${subbiercategory.id}"></i>
+                    <i class="bi bi-folder-fill tree-icon subbiercategory-icon"></i>
+                    <span class="tree-title">${subbiercategory.name}</span>
+                    <span class="tree-count">${subbiercategory.device_count} devices</span>
+                </div>
+                <div class="tree-content" id="edit-subbiercategory-${subbiercategory.id}" style="display: none;">
+        `;
+        
+        if (subbiercategory.devices && subbiercategory.devices.length > 0) {
+            subbiercategory.devices.forEach(device => {
+                html += renderEditDeviceHtml(device);
+            });
+        }
+        
+        html += '</div></div>';
+        return html;
+    }
+
+    function renderEditDeviceHtml(device) {
+        const isSelected = editSelectedDevices.has(device.device_id);
+        const isAvailable = device.available === true;
+        
+        let classes = 'tree-device';
+        if (isSelected) classes += ' selected';
+        if (!isAvailable) classes += ' unavailable';
+        else classes += ' available';
+        
+        let onclick = '';
+        if (isAvailable) {
+            onclick = `onclick="toggleEditDeviceSelection('${device.device_id}')"`;
+        }
+        
+        return `
+            <div class="${classes}" ${onclick}>
+                <div class="device-info">
+                    <div class="device-name">${device.product_name}</div>
+                    <div class="device-details">
+                        <span class="device-id">${device.device_id}</span>
+                        ${device.serial_number ? '<span class="device-serial">• ' + device.serial_number + '</span>' : ''}
+                        <span class="device-status device-status-${device.status}">${device.status}</span>
+                        ${!isAvailable && device.conflict_job ? '<span style="color: var(--error); font-size: 0.75rem;">• Conflict with Job ' + device.conflict_job + '</span>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleEditTreeNode(nodeId) {
+        const contentDiv = document.getElementById(nodeId);
+        const chevron = document.getElementById('chevron-' + nodeId);
+        
+        if (contentDiv && chevron) {
+            if (contentDiv.style.display === 'none') {
+                contentDiv.style.display = 'block';
+                chevron.classList.add('expanded');
+            } else {
+                contentDiv.style.display = 'none';
+                chevron.classList.remove('expanded');
+            }
+        }
+    }
+
+    function toggleEditDeviceSelection(deviceId) {
+        if (editSelectedDevices.has(deviceId)) {
+            editSelectedDevices.delete(deviceId);
+        } else {
+            editSelectedDevices.add(deviceId);
+        }
+        
+        updateEditSelectedDevicesDisplay();
+        updateEditSelectedDevicesInput();
+        updateEditDeviceTreeDisplay();
+    }
+
+    function updateEditSelectedDevicesDisplay() {
+        const container = document.getElementById('editSelectedDevicesList');
+        
+        if (editSelectedDevices.size === 0) {
+            container.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">No devices selected</span>';
+            return;
+        }
+        
+        let html = '';
+        editSelectedDevices.forEach(deviceId => {
+            const device = findEditDeviceInTree(deviceId);
+            if (device) {
+                html += `
+                    <span class="selected-device-badge">
+                        ${device.product_name} (${deviceId})
+                        <button class="remove-device" onclick="toggleEditDeviceSelection('${deviceId}')" title="Remove device">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </span>
+                `;
+            }
+        });
+        
+        container.innerHTML = html;
+    }
+
+    function updateEditSelectedDevicesInput() {
+        document.getElementById('editSelectedDevicesInput').value = Array.from(editSelectedDevices).join(',');
+    }
+
+    function updateEditDeviceTreeDisplay() {
+        if (editDeviceTreeData) {
+            renderEditDeviceTree(editDeviceTreeData);
+        }
+    }
+
+    function findEditDeviceInTree(deviceId) {
+        if (!editDeviceTreeData) return null;
+
+        for (const category of editDeviceTreeData) {
+            if (category.direct_devices) {
+                const device = category.direct_devices.find(d => d.device_id === deviceId);
+                if (device) return device;
+            }
+
+            if (category.subcategories) {
+                for (const subcategory of category.subcategories) {
+                    if (subcategory.direct_devices) {
+                        const device = subcategory.direct_devices.find(d => d.device_id === deviceId);
+                        if (device) return device;
+                    }
+
+                    if (subcategory.subbiercategories) {
+                        for (const subbiercategory of subcategory.subbiercategories) {
+                            if (subbiercategory.devices) {
+                                const device = subbiercategory.devices.find(d => d.device_id === deviceId);
+                                if (device) return device;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // Functions for managing assigned devices in edit modal
+    function loadEditAssignedDevices(jobID, devices) {
+        displayEditAssignedDevices(devices, jobID);
+    }
+
+    function refreshEditAssignedDevices(jobID) {
+        // Fetch fresh device data
+        fetch('/api/v1/jobs/' + jobID + '/devices')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Refreshed devices:', data);
+                const devices = data.devices || data || [];
+                displayEditAssignedDevices(devices, jobID);
+            })
+            .catch(error => {
+                console.error('Error refreshing assigned devices:', error);
+                document.getElementById('editAssignedDevicesList').innerHTML = `
+                    <div class="rc-alert rc-alert-error rc-alert-sm">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error refreshing devices: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function displayEditAssignedDevices(devices, jobID) {
+        const container = document.getElementById('editAssignedDevicesList');
+
+        if (!devices || devices.length === 0) {
+            container.innerHTML = `
+                <div class="rc-empty-state rc-p-md" style="background: var(--surface-2); border-radius: var(--radius-md);">
+                    <i class="bi bi-cpu" style="font-size: 2rem; color: var(--text-muted); margin-bottom: var(--space-sm);"></i>
+                    <p class="rc-text-secondary">No devices assigned to this job yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Group devices by category for better organization
+        const categories = {
+            'Sound': [],
+            'Light': [],
+            'Effect': [],
+            'Stage': [],
+            'Other': []
+        };
+
+        devices.forEach(device => {
+            let category = 'Other';
+            if (device.device && device.device.product) {
+                const product = device.device.product;
+                const categoryID = product.categoryID;
+
+                // Categorize based on categoryID
+                if (categoryID === 1001) category = 'Sound';
+                else if (categoryID === 1002) category = 'Light';
+                else if (categoryID === 1003) category = 'Stage';
+                else if (categoryID === 1004) category = 'Effect';
+            }
+            categories[category].push(device);
+        });
+
+        let html = '';
+        Object.keys(categories).forEach(category => {
+            if (categories[category].length > 0) {
+                html += `
+                    <div class="assigned-category-group rc-mb-md">
+                        <div class="category-header rc-flex rc-flex-center rc-mb-sm">
+                            <i class="bi bi-${getCategoryIcon(category)} rc-mr-sm" style="color: var(--accent-electric);"></i>
+                            <h6 class="rc-heading-6" style="color: var(--text-primary);">${category}</h6>
+                            <span class="device-count-badge rc-ml-sm">${categories[category].length}</span>
+                        </div>
+                        <div class="assigned-devices-list">
+                `;
+
+                categories[category].forEach(device => {
+                    const deviceObj = device.device || device;
+                    const productName = deviceObj.product?.name || 'Unknown Product';
+                    const deviceID = deviceObj.deviceID;
+                    const serialNumber = deviceObj.serialNumber || deviceObj.serialnumber;
+
+                    // Calculate effective price: custom_price if exists and > 0, otherwise product price
+                    const customPrice = device.custom_price;
+                    const productPrice = deviceObj.product?.itemcostperday || deviceObj.product?.itemCostPerDay || 0;
+                    const price = (customPrice && customPrice > 0) ? customPrice : productPrice;
+
+                    html += `
+                        <div class="assigned-device-item rc-flex rc-flex-between rc-flex-center rc-p-sm rc-mb-xs" style="background: var(--surface-2); border-radius: var(--radius-sm); border: 1px solid var(--surface-3);">
+                            <div class="device-info">
+                                <div class="device-name rc-text-sm rc-font-medium">${productName}</div>
+                                <div class="device-details rc-text-xs rc-text-secondary">
+                                    ID: ${deviceID}${serialNumber ? ` • SN: ${serialNumber}` : ''}
+                                </div>
+                            </div>
+                            <div class="device-price-container rc-flex rc-flex-center rc-flex-gap-xs">
+                                <input type="number"
+                                       class="device-price-input rc-input rc-input-sm"
+                                       style="width: 100px;"
+                                       step="0.01"
+                                       onchange="updateDevicePrice(${jobID}, '${deviceID}', this.value)"
+                                       placeholder="${price.toFixed(2)}">
+                                <span class="rc-text-xs">€/day</span>
+                                <button type="button" onclick="removeDeviceFromEditJob(${jobID}, '${deviceID}')"
+                                        class="rc-btn rc-btn-outline rc-btn-sm"
+                                        style="padding: 2px 6px;"
+                                        title="Remove device">
+                                    <i class="bi bi-trash" style="font-size: 0.75rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        container.innerHTML = html;
+    }
+
+    function removeDeviceFromEditJob(jobID, deviceID) {
+        if (confirm('Remove this device from the job?')) {
+            fetch(`/api/v1/jobs/${jobID}/devices/${deviceID}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Refresh the assigned devices display
+                    refreshEditAssignedDevices(jobID);
+                    // Also refresh the available device tree to reflect changes
+                    loadEditDeviceTree(jobID);
+                    // Show success feedback
+                    showToast('Device removed successfully', 'success');
+                } else {
+                    throw new Error('Failed to remove device');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing device:', error);
+                showToast('Error removing device', 'error');
+            });
+        }
+    }
+
+    // Show job devices overview
+    function showJobDevices(jobID) {
+        // Create and show device overview modal
+        const modal = document.createElement('div');
+        modal.className = 'rc-modal-overlay';
+        modal.id = 'jobDevicesModal';
+        modal.innerHTML = `
+            <div class="rc-modal rc-modal-lg">
+                <div class="rc-modal-header">
+                    <h3 class="rc-modal-title">
+                        <i class="bi bi-cpu"></i> Job Devices - Job #${jobID}
+                    </h3>
+                    <button class="rc-modal-close" onclick="closeJobDevicesModal()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="rc-modal-body" id="jobDevicesContent">
+                    <div class="rc-flex rc-flex-center rc-py-xl">
+                        <div class="rc-spinner"></div>
+                        <p class="rc-text-muted rc-ml-md">Loading devices...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+
+        // Fetch job devices
+        fetch('/api/v1/jobs/' + jobID + '/devices')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Devices API response:', data);
+                const devices = data.devices || data || [];
+                displayJobDevices(devices, jobID);
+            })
+            .catch(error => {
+                document.getElementById('jobDevicesContent').innerHTML = `
+                    <div class="rc-alert rc-alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error loading devices: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function displayJobDevices(devices, jobID) {
+        const categories = {
+            'Sound': [],
+            'Light': [],
+            'Effect': [],
+            'Stage': [],
+            'Other': []
+        };
+
+        // Group devices by category using categoryID and subcategoryID
+        devices.forEach(device => {
+            let category = 'Other';
+            if (device.device && device.device.product) {
+                const product = device.device.product;
+                const categoryID = product.categoryID;
+                const subcategoryID = product.subcategoryID;
+                
+                // Categorize based on categoryID and subcategoryID patterns
+                if (categoryID === 1001) { // Sound category
+                    category = 'Sound';
+                } else if (categoryID === 1002) { // Light category  
+                    category = 'Light';
+                } else if (categoryID === 1003) { // Stage category
+                    category = 'Stage';
+                } else if (categoryID === 1004) { // Effect category
+                    category = 'Effect';
+                } else if (subcategoryID) {
+                    // Fallback: categorize based on subcategory prefix
+                    const subcat = subcategoryID.toLowerCase();
+                    if (subcat.startsWith('snd') || subcat.includes('mic') || subcat.includes('mix') || subcat.includes('amp')) {
+                        category = 'Sound';
+                    } else if (subcat.startsWith('lgt') || subcat.includes('light') || subcat.includes('led')) {
+                        category = 'Light';
+                    } else if (subcat.startsWith('stg') || subcat.includes('stage') || subcat.includes('lift') || subcat.includes('lft')) {
+                        category = 'Stage';
+                    } else if (subcat.startsWith('efx') || subcat.includes('effect') || subcat.includes('fog') || subcat.includes('smoke')) {
+                        category = 'Effect';
+                    }
+                }
+            }
+            categories[category].push(device);
+        });
+
+        let html = '';
+        Object.entries(categories).forEach(([categoryName, categoryDevices]) => {
+            if (categoryDevices.length > 0) {
+                html += `
+                    <div class="rc-card rc-mb-md">
+                        <div class="rc-card-header">
+                            <h4 class="rc-card-title">
+                                <i class="bi bi-${getCategoryIcon(categoryName)}"></i>
+                                ${categoryName} (${categoryDevices.length})
+                            </h4>
+                        </div>
+                        <div class="rc-card-body">
+                `;
+                
+                categoryDevices.forEach(device => {
+                    const deviceName = device.device?.product?.name || device.device?.deviceID || 'Unknown Device';
+                    // Calculate effective price: custom_price if exists and > 0, otherwise product price
+                    const customPrice = device.custom_price;
+                    // Fix: JSON field is "itemcostperday" not "itemCostPerDay"  
+                    const productPrice = device.device?.product?.itemcostperday || device.device?.product?.itemCostPerDay || 0;
+                    const price = (customPrice && customPrice > 0) ? customPrice : productPrice;
+                    html += `
+                        <div class="device-item rc-flex rc-flex-between rc-flex-items-center rc-p-sm rc-mb-xs" style="border: 1px solid var(--surface-3); border-radius: var(--radius-sm);">
+                            <div>
+                                <strong>${deviceName}</strong>
+                                <br><small class="rc-text-muted">${device.device?.deviceID}</small>
+                            </div>
+                            <div class="rc-flex rc-flex-items-center rc-flex-gap-sm">
+                                <input type="number" 
+                                       value="${price.toFixed(2)}" 
+                                       class="device-price-input rc-input rc-input-sm" 
+                                       style="width: 100px;" 
+                                       step="0.01"
+                                       onchange="updateDevicePrice(${jobID}, '${device.device?.deviceID}', this.value)"
+                                       placeholder="0.00">
+                                <span class="rc-text-sm">€</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (html === '') {
+            html = `
+                <div class="rc-empty-state">
+                    <i class="bi bi-cpu rc-empty-icon"></i>
+                    <h3 class="rc-heading-3">No devices assigned</h3>
+                    <p class="rc-text">This job has no devices assigned yet.</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('jobDevicesContent').innerHTML = html;
+    }
+
+    function getCategoryIcon(category) {
+        const icons = {
+            'Sound': 'volume-up',
+            'Light': 'lightbulb',
+            'Effect': 'stars',
+            'Stage': 'building',
+            'Other': 'gear'
+        };
+        return icons[category] || 'gear';
+    }
+
+    function updateDevicePrice(jobID, deviceID, newPrice) {
+        const price = parseFloat(newPrice) || 0;
+        
+        fetch('/api/v1/jobs/' + jobID + '/devices/' + deviceID, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                price: price
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update price');
+            }
+            // Show success feedback
+            showPriceUpdateFeedback(true);
+            
+            // Refresh the job data in the main jobs table
+            refreshJobRevenue(jobID);
+        })
+        .catch(error => {
+            console.error('Error updating device price:', error);
+            showPriceUpdateFeedback(false);
+        });
+    }
+
+    function refreshJobRevenue(jobID) {
+        // Fetch updated job data
+        fetch('/api/v1/jobs/' + jobID)
+            .then(response => response.json())
+            .then(data => {
+                // Update revenue in the main jobs table
+                const jobRow = document.querySelector(`tr[data-job-id="${jobID}"]`);
+                if (jobRow) {
+                    const revenueCell = jobRow.querySelector('td:nth-child(8)'); // Revenue column
+                    if (revenueCell) {
+                        const newRevenue = data.finalRevenue || data.revenue || 0;
+                        revenueCell.innerHTML = `<span class="rc-text-mono">€${newRevenue.toFixed(2)}</span>`;
+                    }
+                }
+                
+                // Also update the revenue in the current modal if it's showing the same job
+                const currentModalJobID = document.getElementById('jobDetailsModal').getAttribute('data-current-job-id');
+                if (currentModalJobID == jobID) {
+                    const modalRevenue = document.querySelector('#jobDetailsContent .rc-text-lg');
+                    if (modalRevenue && modalRevenue.textContent.startsWith('€')) {
+                        const newRevenue = data.finalRevenue || data.revenue || 0;
+                        modalRevenue.textContent = `€${newRevenue.toFixed(2)}`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error refreshing job revenue:', error);
+            });
+    }
+
+    function showPriceUpdateFeedback(success) {
+        const toast = document.createElement('div');
+        toast.className = `rc-toast ${success ? 'rc-toast-success' : 'rc-toast-error'}`;
+        toast.innerHTML = `
+            <i class="bi bi-${success ? 'check-circle' : 'exclamation-circle'}"></i>
+            ${success ? 'Price updated successfully' : 'Failed to update price'}
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    function closeJobDevicesModal() {
+        const modal = document.getElementById('jobDevicesModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    // ===== RENTAL EQUIPMENT FUNCTIONS =====
+
+    function refreshJobRentalEquipment(jobID) {
+        fetch(`/api/v1/rental-equipment/job/${jobID}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Refreshed rental equipment:', data);
+                const rentalEquipment = data || [];
+                displayJobRentalEquipment(rentalEquipment, jobID);
+            })
+            .catch(error => {
+                console.error('Error refreshing rental equipment:', error);
+                document.getElementById('editRentalEquipmentList').innerHTML = `
+                    <div class="rc-alert rc-alert-error rc-alert-sm">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error refreshing rental equipment: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function displayJobRentalEquipment(rentalEquipment, jobID) {
+        const container = document.getElementById('editRentalEquipmentList');
+
+        if (!rentalEquipment || rentalEquipment.length === 0) {
+            container.innerHTML = `
+                <div class="rc-empty-state rc-p-md" style="background: var(--surface-2); border-radius: var(--radius-md);">
+                    <i class="bi bi-box-seam" style="font-size: 2rem; color: var(--text-muted); margin-bottom: var(--space-sm);"></i>
+                    <p class="rc-text-secondary">No rental equipment added to this job yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = rentalEquipment.map(rental => `
+            <div class="rc-card rc-card-sm rc-mb-sm" data-rental-id="${rental.EquipmentID}">
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-between rc-flex-align-start">
+                        <div class="rc-flex-1">
+                            <h6 class="rc-heading-6 rc-mb-xs">${rental.RentalEquipment?.ProductName || 'Unknown Product'}</h6>
+                            <p class="rc-text-sm rc-text-secondary rc-mb-xs">
+                                <i class="bi bi-building"></i> ${rental.RentalEquipment?.SupplierName || 'Unknown Supplier'}
+                                ${rental.RentalEquipment?.Category ? `• <span class="rc-badge rc-badge-outline rc-badge-xs">${rental.RentalEquipment.Category}</span>` : ''}
+                            </p>
+                            <div class="rc-flex rc-flex-gap-md rc-text-sm">
+                                <span><strong>Qty:</strong> ${rental.Quantity}</span>
+                                <span><strong>Days:</strong> ${rental.DaysUsed}</span>
+                                <span><strong>Rate:</strong> €${(rental.RentalEquipment?.RentalPrice || 0).toFixed(2)}/day</span>
+                                <span class="rc-text-primary"><strong>Total:</strong> €${rental.TotalCost.toFixed(2)}</span>
+                            </div>
+                            ${rental.Notes ? `<p class="rc-text-xs rc-text-secondary rc-mt-xs"><i class="bi bi-chat-text"></i> ${rental.Notes}</p>` : ''}
+                        </div>
+                        <div class="rc-flex rc-flex-gap-xs">
+                            <button type="button" onclick="removeRentalFromJob(${jobID}, ${rental.EquipmentID})"
+                                    class="rc-btn rc-btn-outline rc-btn-sm rc-btn-danger" title="Remove rental">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = html;
+    }
+
+    function showManualRentalEntry(jobID) {
+        const modal = document.createElement('div');
+        modal.className = 'rc-modal';
+        modal.id = 'manualRentalModal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="rc-modal-overlay" onclick="closeManualRentalModal()"></div>
+            <div class="rc-modal-content" style="max-width: 600px;">
+                <div class="rc-modal-header">
+                    <h3 class="rc-modal-title">
+                        <i class="bi bi-plus-lg"></i> Add Rental Equipment
+                    </h3>
+                    <button class="rc-modal-close" onclick="closeManualRentalModal()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="rc-modal-body">
+                    <form id="manualRentalForm" onsubmit="submitManualRental(event, ${jobID})">
+                        <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md">
+                            <div class="rc-form-group">
+                                <label class="rc-label">Product Name *</label>
+                                <input type="text" class="rc-input" name="productName" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Supplier Name *</label>
+                                <input type="text" class="rc-input" name="supplierName" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Daily Rental Price (€) *</label>
+                                <input type="number" class="rc-input" name="rentalPrice" step="0.01" min="0" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Category</label>
+                                <input type="text" class="rc-input" name="category" list="categoryList">
+                                <datalist id="categoryList">
+                                    <option value="Audio">
+                                    <option value="Video">
+                                    <option value="Lighting">
+                                    <option value="Stage Equipment">
+                                    <option value="Transportation">
+                                    <option value="Other">
+                                </datalist>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Quantity *</label>
+                                <input type="number" class="rc-input" name="quantity" min="1" value="1" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Days Used *</label>
+                                <input type="number" class="rc-input" name="daysUsed" min="1" value="1" required>
+                            </div>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Description</label>
+                            <textarea class="rc-input" name="description" rows="2"></textarea>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Notes</label>
+                            <textarea class="rc-input" name="notes" rows="2"></textarea>
+                        </div>
+                        <div class="rc-flex rc-flex-between rc-mt-lg">
+                            <button type="button" onclick="closeManualRentalModal()" class="rc-btn rc-btn-secondary">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </button>
+                            <button type="submit" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-plus-lg"></i> Add Rental
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+    }
+
+    function closeManualRentalModal() {
+        const modal = document.getElementById('manualRentalModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    function submitManualRental(event, jobID) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+        submitBtn.disabled = true;
+
+        const data = {
+            jobID: jobID,
+            productName: formData.get('productName'),
+            supplierName: formData.get('supplierName'),
+            rentalPrice: parseFloat(formData.get('rentalPrice')),
+            category: formData.get('category') || '',
+            description: formData.get('description') || '',
+            notes: formData.get('notes') || '',
+            quantity: parseInt(formData.get('quantity')),
+            daysUsed: parseInt(formData.get('daysUsed'))
+        };
+
+        fetch('/api/v1/rental-equipment/manual-entry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            // Success - close modal and refresh
+            closeManualRentalModal();
+            refreshJobRentalEquipment(jobID);
+            showToast('Rental equipment added successfully', 'success');
+        })
+        .catch(error => {
+            // Restore button and show error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            showToast('Error adding rental equipment: ' + error.message, 'error');
+        });
+    }
+
+    function showRentalSelection(jobID) {
+        const modal = document.createElement('div');
+        modal.className = 'rc-modal';
+        modal.id = 'rentalSelectionModal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="rc-modal-overlay" onclick="closeRentalSelectionModal()"></div>
+            <div class="rc-modal-content" style="max-width: 800px;">
+                <div class="rc-modal-header">
+                    <h3 class="rc-modal-title">
+                        <i class="bi bi-collection"></i> Select Rental Equipment
+                    </h3>
+                    <button class="rc-modal-close" onclick="closeRentalSelectionModal()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="rc-modal-body">
+                    <div class="rc-text-center rc-py-xl">
+                        <div class="rc-spinner"></div>
+                        <p class="rc-text-muted rc-mt-md">Loading rental equipment...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Load rental equipment
+        fetch('/api/v1/rental-equipment')
+            .then(response => response.json())
+            .then(equipmentList => {
+                const modalBody = modal.querySelector('.rc-modal-body');
+
+                if (!equipmentList || equipmentList.length === 0) {
+                    modalBody.innerHTML = `
+                        <div class="rc-empty-state rc-text-center rc-py-xl">
+                            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <h4>No Equipment Available</h4>
+                            <p class="rc-text-muted">No rental equipment found. Add some equipment first.</p>
+                            <a href="/rental-equipment" class="rc-btn rc-btn-primary rc-mt-md">
+                                <i class="bi bi-plus-lg"></i> Add Equipment
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                modalBody.innerHTML = `
+                    <div class="rc-mb-md">
+                        <input type="text" class="rc-input" id="rentalSearchInput" placeholder="Search equipment..."
+                               oninput="filterRentalEquipment()">
+                    </div>
+                    <div id="rentalEquipmentGrid" class="rc-grid rc-grid-cols-1 rc-grid-gap-sm" style="max-height: 400px; overflow-y: auto;">
+                        ${equipmentList.map(equipment => `
+                            <div class="rc-card rc-card-hover rc-cursor-pointer rental-equipment-item"
+                                 data-search="${equipment.ProductName} ${equipment.SupplierName} ${equipment.Category}"
+                                 onclick="selectRentalEquipment(${equipment.EquipmentID}, '${equipment.ProductName}', '${equipment.SupplierName}', ${equipment.RentalPrice}, ${jobID})">
+                                <div class="rc-card-body">
+                                    <div class="rc-flex rc-flex-between">
+                                        <div>
+                                            <h6 class="rc-heading-6">${equipment.ProductName}</h6>
+                                            <p class="rc-text-sm rc-text-secondary">
+                                                <i class="bi bi-building"></i> ${equipment.SupplierName}
+                                                ${equipment.Category ? `• <span class="rc-badge rc-badge-outline rc-badge-xs">${equipment.Category}</span>` : ''}
+                                            </p>
+                                            <p class="rc-text-primary rc-font-weight-600">€${equipment.RentalPrice.toFixed(2)}/day</p>
+                                        </div>
+                                        <div class="rc-text-right rc-text-sm rc-text-muted">
+                                            ${equipment.TotalUsed > 0 ? `Used ${equipment.TotalUsed} times` : 'Never used'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            })
+            .catch(error => {
+                modal.querySelector('.rc-modal-body').innerHTML = `
+                    <div class="rc-alert rc-alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error loading rental equipment: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    function filterRentalEquipment() {
+        const searchTerm = document.getElementById('rentalSearchInput').value.toLowerCase();
+        const items = document.querySelectorAll('.rental-equipment-item');
+
+        items.forEach(item => {
+            const searchText = item.getAttribute('data-search').toLowerCase();
+            item.style.display = searchText.includes(searchTerm) ? 'block' : 'none';
+        });
+    }
+
+    function selectRentalEquipment(equipmentID, productName, supplierName, rentalPrice, jobID) {
+        closeRentalSelectionModal();
+
+        // Show quantity/days modal
+        const modal = document.createElement('div');
+        modal.className = 'rc-modal';
+        modal.id = 'rentalQuantityModal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="rc-modal-overlay" onclick="closeRentalQuantityModal()"></div>
+            <div class="rc-modal-content" style="max-width: 400px;">
+                <div class="rc-modal-header">
+                    <h3 class="rc-modal-title">
+                        <i class="bi bi-plus-lg"></i> Add to Job
+                    </h3>
+                    <button class="rc-modal-close" onclick="closeRentalQuantityModal()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="rc-modal-body">
+                    <div class="rc-mb-md">
+                        <h5>${productName}</h5>
+                        <p class="rc-text-sm rc-text-secondary">${supplierName} • €${rentalPrice.toFixed(2)}/day</p>
+                    </div>
+
+                    <form onsubmit="addSelectedRentalToJob(event, ${equipmentID}, ${jobID})">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Quantity *</label>
+                            <input type="number" class="rc-input" name="quantity" min="1" value="1" required>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Days Used *</label>
+                            <input type="number" class="rc-input" name="daysUsed" min="1" value="1" required>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Notes</label>
+                            <textarea class="rc-input" name="notes" rows="2"></textarea>
+                        </div>
+                        <div class="rc-flex rc-flex-between rc-mt-lg">
+                            <button type="button" onclick="closeRentalQuantityModal()" class="rc-btn rc-btn-secondary">
+                                Cancel
+                            </button>
+                            <button type="submit" class="rc-btn rc-btn-primary">
+                                Add to Job
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+    }
+
+    function closeRentalSelectionModal() {
+        const modal = document.getElementById('rentalSelectionModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    function closeRentalQuantityModal() {
+        const modal = document.getElementById('rentalQuantityModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    function addSelectedRentalToJob(event, equipmentID, jobID) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+        submitBtn.disabled = true;
+
+        const data = {
+            jobID: jobID,
+            equipmentID: equipmentID,
+            quantity: parseInt(formData.get('quantity')),
+            daysUsed: parseInt(formData.get('daysUsed')),
+            notes: formData.get('notes') || ''
+        };
+
+        fetch('/api/v1/rental-equipment/add-to-job', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            // Success - close modal and refresh
+            closeRentalQuantityModal();
+            refreshJobRentalEquipment(jobID);
+            showToast('Rental equipment added to job successfully', 'success');
+        })
+        .catch(error => {
+            // Restore button and show error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            showToast('Error adding rental to job: ' + error.message, 'error');
+        });
+    }
+
+    function removeRentalFromJob(jobID, equipmentID) {
+        if (!confirm('Are you sure you want to remove this rental equipment from the job?')) {
+            return;
+        }
+
+        fetch(`/api/v1/rental-equipment/job/${jobID}/equipment/${equipmentID}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            refreshJobRentalEquipment(jobID);
+            showToast('Rental equipment removed successfully', 'success');
+        })
+        .catch(error => {
+            console.error('Error removing rental equipment:', error);
+            showToast('Error removing rental equipment', 'error');
+        });
+    }
+
+    function showToast(message, type) {
+        // Simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `rc-toast rc-toast-${type}`;
+        toast.innerHTML = `
+            <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            ${message}
+        `;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            color: white;
+            background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            box-shadow: var(--shadow-lg);
+            min-width: 300px;
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // ===== JOB EDIT MODAL FILE UPLOAD FUNCTIONS =====
+
+    let editJobSelectedFiles = [];
+
+    function handleEditJobFileSelection(input) {
+        const files = Array.from(input.files);
+        editJobSelectedFiles = editJobSelectedFiles.concat(files);
+        displayEditJobSelectedFiles();
+    }
+
+    function displayEditJobSelectedFiles() {
+        const container = document.getElementById('editSelectedFilesContainer');
+        const listDiv = document.getElementById('editSelectedFilesList');
+
+        if (editJobSelectedFiles.length === 0) {
+            listDiv.style.display = 'none';
+            return;
+        }
+
+        listDiv.style.display = 'block';
+
+        container.innerHTML = editJobSelectedFiles.map((file, index) => `
+            <div class="selected-file-item rc-flex rc-flex-between rc-flex-align-center rc-p-sm" style="border: 1px solid var(--surface-3); border-radius: 6px; margin-bottom: 6px; background: var(--surface-1);">
+                <div class="rc-flex rc-flex-align-center rc-flex-gap-sm">
+                    <i class="bi bi-file-earmark" style="color: var(--primary);"></i>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 500;">${file.name}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">${formatEditJobFileSize(file.size)}</div>
+                    </div>
+                </div>
+                <button type="button" class="rc-btn rc-btn-ghost rc-btn-sm" onclick="removeEditJobSelectedFile(${index})" style="color: var(--error);">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function removeEditJobSelectedFile(index) {
+        editJobSelectedFiles.splice(index, 1);
+        displayEditJobSelectedFiles();
+    }
+
+    function formatEditJobFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    async function uploadEditJobFiles() {
+        if (editJobSelectedFiles.length === 0) {
+            showToast('No files selected', 'error');
+            return;
+        }
+
+        const uploadBtn = document.querySelector('#editSelectedFilesList button');
+        const originalText = uploadBtn.innerHTML;
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s linear infinite;"></i> Uploading...';
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Get current job ID from the form
+        const jobIDInput = document.querySelector('#editJobForm input[readonly]');
+        const jobID = jobIDInput ? jobIDInput.value : null;
+
+        if (!jobID) {
+            showToast('Cannot determine job ID', 'error');
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = originalText;
+            return;
+        }
+
+        for (const file of editJobSelectedFiles) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('jobID', jobID);
+
+            try {
+                const response = await fetch('/api/jobs/attachments/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } catch (error) {
+                console.error('Error uploading file:', file.name, error);
+                errorCount++;
+            }
+        }
+
+        // Reset state
+        editJobSelectedFiles = [];
+        displayEditJobSelectedFiles();
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = originalText;
+
+        // Show result
+        if (errorCount === 0) {
+            showToast(`${successCount} file(s) uploaded successfully!`, 'success');
+        } else {
+            showToast(`${successCount} uploaded, ${errorCount} failed`, 'warning');
+        }
+
+        // Reload attachments
+        loadEditJobAttachments(jobID);
+    }
+
+    async function loadEditJobAttachments(jobID) {
+        try {
+            const response = await fetch(`/api/jobs/${jobID}/attachments`);
+            const attachments = await response.json();
+
+            const container = document.getElementById('editAttachmentsList');
+            if (!attachments || attachments.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); font-style: italic; margin: 0;">No files attached yet.</p>';
+                return;
+            }
+
+            container.innerHTML = attachments.map(attachment => `
+                <div class="attachment-item rc-flex rc-flex-between rc-flex-align-center rc-p-sm" style="border: 1px solid var(--surface-3); border-radius: 6px; margin-bottom: 6px; background: var(--surface-1);">
+                    <div class="rc-flex rc-flex-align-center rc-flex-gap-sm">
+                        <i class="bi ${getEditJobFileIcon(attachment.mimeType)}" style="color: var(--primary);"></i>
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: 500;">
+                                <button onclick="previewJobDetailsFile(${attachment.attachmentID}, '${attachment.originalFilename}', '${attachment.mimeType}', '${attachment.fileSizeFormatted}')"
+                                        style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 0; text-decoration: underline; font-size: 14px; font-weight: 500;"
+                                        title="Click to preview">
+                                    ${attachment.originalFilename}
+                                </button>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted);">
+                                ${attachment.fileSizeFormatted}
+                                ${attachment.uploader ? ` • by ${attachment.uploader.firstName} ${attachment.uploader.lastName}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rc-flex rc-flex-align-center rc-flex-gap-xs">
+                        <button class="rc-btn rc-btn-outline rc-btn-sm"
+                                onclick="previewJobDetailsFile(${attachment.attachmentID}, '${attachment.originalFilename}', '${attachment.mimeType}', '${attachment.fileSizeFormatted}')"
+                                title="Preview">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" onclick="downloadEditJobAttachment(${attachment.attachmentID})" title="Download">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" onclick="deleteEditJobAttachment(${attachment.attachmentID}, '${attachment.originalFilename}')" title="Delete" style="color: var(--error);">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading edit job attachments:', error);
+            document.getElementById('editAttachmentsList').innerHTML = '<p style="color: var(--error); margin: 0;">Error loading attachments.</p>';
+        }
+    }
+
+    function getEditJobFileIcon(mimeType) {
+        if (mimeType.startsWith('image/')) return 'bi-image';
+        if (mimeType.startsWith('video/')) return 'bi-play-circle';
+        if (mimeType.startsWith('audio/')) return 'bi-music-note';
+        if (mimeType.includes('pdf')) return 'bi-file-pdf';
+        if (mimeType.includes('word') || mimeType.includes('document')) return 'bi-file-text';
+        if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'bi-file-spreadsheet';
+        if (mimeType.includes('zip') || mimeType.includes('archive')) return 'bi-file-zip';
+        return 'bi-file-earmark';
+    }
+
+    function downloadEditJobAttachment(attachmentID) {
+        window.open(`/api/jobs/attachments/${attachmentID}/download`, '_blank');
+    }
+
+    async function deleteEditJobAttachment(attachmentID, filename) {
+        if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
+
+        try {
+            const response = await fetch(`/api/jobs/attachments/${attachmentID}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showToast('Attachment deleted successfully!', 'success');
+                // Get current job ID and reload attachments
+                const jobIDInput = document.querySelector('#editJobForm input[readonly]');
+                const jobID = jobIDInput ? jobIDInput.value : null;
+                if (jobID) loadEditJobAttachments(jobID);
+            } else {
+                showToast('Failed to delete attachment: ' + (result.error || 'Unknown error'), 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting attachment:', error);
+            showToast('Error deleting attachment', 'error');
+        }
+    }
+
+    // ===== TOGGLE FUNCTIONS FOR EDIT MODAL =====
+
+    function toggleEditAttachments() {
+        const section = document.getElementById('editAttachmentsSection');
+        const button = document.getElementById('toggleEditAttachmentsBtn');
+
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            button.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Files';
+
+            // Load attachments when showing for the first time
+            const jobIDInput = document.querySelector('#editJobForm input[readonly]');
+            const jobID = jobIDInput ? jobIDInput.value : null;
+            if (jobID) loadEditJobAttachments(jobID);
+
+            // Setup drag and drop functionality
+            setupEditJobDragAndDrop();
+        } else {
+            section.style.display = 'none';
+            button.innerHTML = '<i class="bi bi-eye"></i> Show Files';
+        }
+    }
+
+    function toggleEditDeviceTree() {
+        const section = document.getElementById('editDeviceManagementSection');
+        const button = document.getElementById('toggleEditDeviceTreeBtn');
+
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            button.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Device Tree';
+
+            // Load device tree when showing for the first time
+            const jobIDInput = document.querySelector('#editJobForm input[readonly]');
+            const jobID = jobIDInput ? jobIDInput.value : null;
+            if (jobID) {
+                const startDate = document.querySelector('#editJobForm input[name="startDate"]').value;
+                const endDate = document.querySelector('#editJobForm input[name="endDate"]').value;
+                if (startDate && endDate) {
+                    loadEditDeviceTree(jobID);
+                }
+            }
+        } else {
+            section.style.display = 'none';
+            button.innerHTML = '<i class="bi bi-eye"></i> Show Device Tree';
+        }
+    }
+
+    // ===== DEVICE TREE EXPAND/COLLAPSE FUNCTIONS =====
+
+    function expandAllEditTreeNodes() {
+        const treeContainer = document.getElementById('editDeviceTreeContainer');
+        if (!treeContainer) return;
+
+        // Find all tree content divs that are collapsed
+        const collapsedNodes = treeContainer.querySelectorAll('.tree-content[style*="display: none"]');
+        const collapsedChevrons = treeContainer.querySelectorAll('.tree-chevron:not(.expanded)');
+
+        collapsedNodes.forEach(node => {
+            node.style.display = 'block';
+        });
+
+        collapsedChevrons.forEach(chevron => {
+            chevron.classList.add('expanded');
+        });
+
+        console.log(`Expanded ${collapsedNodes.length} device tree nodes`);
+    }
+
+    function collapseAllEditTreeNodes() {
+        const treeContainer = document.getElementById('editDeviceTreeContainer');
+        if (!treeContainer) return;
+
+        // Find all tree content divs that are expanded
+        const expandedNodes = treeContainer.querySelectorAll('.tree-content[style*="display: block"], .tree-content:not([style*="display: none"])');
+        const expandedChevrons = treeContainer.querySelectorAll('.tree-chevron.expanded');
+
+        expandedNodes.forEach(node => {
+            node.style.display = 'none';
+        });
+
+        expandedChevrons.forEach(chevron => {
+            chevron.classList.remove('expanded');
+        });
+
+        console.log(`Collapsed ${expandedNodes.length} device tree nodes`);
+    }
+
+    // Job Details Attachments Functions
+    async function loadJobDetailsAttachments(jobID) {
+        try {
+            const response = await fetch(`/api/jobs/${jobID}/attachments`);
+            const attachments = await response.json();
+
+            const countBadge = document.getElementById('attachmentCount');
+            const container = document.getElementById('jobDetailsAttachmentsList');
+
+            if (countBadge) {
+                countBadge.textContent = attachments && attachments.length ? attachments.length : '0';
+            }
+
+            if (!attachments || attachments.length === 0) {
+                container.innerHTML = `
+                    <div class="rc-card-body">
+                        <div class="rc-text-center rc-py-md">
+                            <i class="bi bi-file-earmark" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 8px;"></i>
+                            <p style="color: var(--text-muted); font-style: italic; margin: 0;">No files attached to this job.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="rc-card-body">
+                    ${attachments.map(attachment => `
+                        <div class="attachment-item rc-flex rc-flex-between rc-flex-align-center rc-p-sm" style="border: 1px solid var(--surface-3); border-radius: 6px; margin-bottom: 6px; background: var(--surface-1);">
+                            <div class="rc-flex rc-flex-align-center rc-flex-gap-sm">
+                                <i class="bi ${getJobDetailsFileIcon(attachment.mimeType)}" style="color: var(--primary);"></i>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 14px; font-weight: 500;">
+                                        <button onclick="previewJobDetailsFile(${attachment.attachmentID}, '${attachment.originalFilename}', '${attachment.mimeType}', '${attachment.fileSizeFormatted}')"
+                                                style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 0; text-decoration: underline; font-size: 14px; font-weight: 500;"
+                                                title="Click to preview">
+                                            ${attachment.originalFilename}
+                                        </button>
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">
+                                        ${attachment.fileSizeFormatted}
+                                        ${attachment.uploader ? ` • by ${attachment.uploader.firstName} ${attachment.uploader.lastName}` : ''}
+                                        • ${new Date(attachment.uploadedAt).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rc-flex rc-flex-align-center rc-flex-gap-xs">
+                                <button class="rc-btn rc-btn-outline rc-btn-sm"
+                                        onclick="previewJobDetailsFile(${attachment.attachmentID}, '${attachment.originalFilename}', '${attachment.mimeType}', '${attachment.fileSizeFormatted}')"
+                                        title="Preview">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" onclick="downloadJobDetailsAttachment(${attachment.attachmentID})" title="Download">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading job details attachments:', error);
+            const container = document.getElementById('jobDetailsAttachmentsList');
+            if (container) {
+                container.innerHTML = `
+                    <div class="rc-card-body">
+                        <div class="rc-alert rc-alert-error">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Error loading attachments.
+                        </div>
+                    </div>
+                `;
+            }
+            const countBadge = document.getElementById('attachmentCount');
+            if (countBadge) {
+                countBadge.textContent = 'Error';
+            }
+        }
+    }
+
+    function getJobDetailsFileIcon(mimeType) {
+        if (mimeType.startsWith('image/')) return 'bi-image';
+        if (mimeType.startsWith('video/')) return 'bi-play-circle';
+        if (mimeType.startsWith('audio/')) return 'bi-music-note';
+        if (mimeType.includes('pdf')) return 'bi-file-pdf';
+        if (mimeType.includes('word') || mimeType.includes('document')) return 'bi-file-text';
+        if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'bi-file-spreadsheet';
+        if (mimeType.includes('zip') || mimeType.includes('archive')) return 'bi-file-zip';
+        return 'bi-file-earmark';
+    }
+
+    function downloadJobDetailsAttachment(attachmentID) {
+        window.open(`/api/jobs/attachments/${attachmentID}/download`, '_blank');
+    }
+
+    // File Preview Variables
+    let currentPreviewFileData = null;
+
+    // Preview file in modal
+    async function previewJobDetailsFile(attachmentID, filename, mimeType, fileSize) {
+        currentPreviewFileData = { attachmentID, filename, mimeType, fileSize };
+
+        // Create or get preview modal
+        let modal = document.getElementById('filePreviewModal');
+        if (!modal) {
+            modal = createFilePreviewModal();
+            document.body.appendChild(modal);
+        }
+
+        // Update modal title and info
+        document.getElementById('filePreviewTitle').textContent = filename;
+        document.getElementById('filePreviewInfo').textContent = `${fileSize} • ${mimeType}`;
+
+        // Apply adaptive sizing based on file type
+        applyAdaptiveModalSizing(modal, mimeType, filename);
+
+        // Show modal immediately
+        modal.style.display = 'flex';
+
+        // Show loading state
+        const content = document.getElementById('filePreviewContent');
+        content.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite; font-size: 2rem; margin-bottom: 16px;"></i>
+                <div>Loading file preview...</div>
+            </div>
+        `;
+
+        try {
+            await loadJobDetailsFilePreview(attachmentID, mimeType, filename);
+        } catch (error) {
+            console.error('Error loading file preview:', error);
+            content.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--danger);">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 2rem; margin-bottom: 16px;"></i>
+                    <div>Failed to load file preview</div>
+                    <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary rc-btn-sm" style="margin-top: 16px;">
+                        <i class="bi bi-download"></i> Download Instead
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Create file preview modal
+    function createFilePreviewModal() {
+        const modal = document.createElement('div');
+        modal.id = 'filePreviewModal';
+        modal.className = 'rc-modal';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+            <div class="rc-modal-overlay" onclick="hideFilePreviewModal()"></div>
+            <div class="rc-modal-content" id="filePreviewModalContent" style="max-width: 95vw !important; max-height: 98vh !important; width: 1400px !important; height: 90vh !important; margin: 1vh auto !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; border-radius: 12px !important; overflow: hidden !important; display: flex !important; flex-direction: column !important;">
+                <div class="rc-modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--surface-3); background: var(--surface-1); flex-shrink: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <h3 class="rc-modal-title" id="filePreviewTitle" style="font-size: 18px; font-weight: 600; margin: 0; color: var(--text-primary);">File Preview</h3>
+                            <p class="rc-text-muted rc-text-sm" id="filePreviewInfo" style="margin: 4px 0 0 0; font-size: 13px;"></p>
+                        </div>
+                        <button class="rc-modal-close" onclick="hideFilePreviewModal()" style="padding: 8px; border-radius: 6px; transition: all 0.2s ease; background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
+                            <i class="bi bi-x-lg" style="font-size: 16px;"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="rc-modal-body" id="filePreviewContent" style="flex: 1; overflow: auto; background: var(--surface-0); padding: 0; min-height: 0;">
+                    <div style="text-align: center; padding: 60px 40px; color: var(--text-muted);">
+                        <i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite; font-size: 2.5rem; margin-bottom: 16px; color: var(--primary);"></i>
+                        <div style="font-size: 16px;">Loading file preview...</div>
+                    </div>
+                </div>
+                <div class="rc-modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--surface-3); background: var(--surface-1); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="bi bi-info-circle" style="color: var(--text-muted); font-size: 14px;"></i>
+                        <span style="font-size: 13px; color: var(--text-muted);">Press Esc to close</span>
+                    </div>
+                    <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-outline" style="padding: 8px 16px;">
+                        <i class="bi bi-download"></i> Download
+                    </button>
+                </div>
+            </div>
+        `;
+        return modal;
+    }
+
+    // Load file preview based on type
+    async function loadJobDetailsFilePreview(attachmentID, mimeType, filename) {
+        const content = document.getElementById('filePreviewContent');
+
+        if (mimeType.startsWith('image/') ||
+           filename.endsWith('.jpg') ||
+           filename.endsWith('.jpeg') ||
+           filename.endsWith('.png') ||
+           filename.endsWith('.gif') ||
+           filename.endsWith('.webp') ||
+           filename.endsWith('.svg') ||
+           filename.endsWith('.bmp') ||
+           filename.endsWith('.tiff') ||
+           filename.endsWith('.ico')) {
+            // Enhanced image preview with metadata and adaptive sizing
+            const img = new Image();
+            img.onload = function() {
+                // Apply adaptive sizing based on image aspect ratio
+                adaptModalForImage(img.naturalWidth, img.naturalHeight);
+
+                content.innerHTML = `
+                    <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                        <div style="padding: 16px 24px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3); display: flex; align-items: center; gap: 12px;">
+                            <i class="bi bi-image" style="font-size: 18px; color: var(--primary);"></i>
+                            <div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 600;">${filename}</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Image • ${img.naturalWidth}x${img.naturalHeight}px • ${getImageOrientation(img.naturalWidth, img.naturalHeight)}</p>
+                            </div>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden;">
+                            <img src="/api/jobs/attachments/${attachmentID}/view"
+                                 alt="${filename}"
+                                 id="previewImage"
+                                 style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); cursor: zoom-in; transition: transform 0.3s ease;"
+                                 onclick="toggleImageZoom(this);">
+                        </div>
+                    </div>
+                `;
+            };
+            img.onerror = function() {
+                throw new Error('Failed to load image');
+            };
+            img.src = `/api/jobs/attachments/${attachmentID}/view`;
+        } else if (mimeType === 'application/pdf') {
+            // PDF preview with enhanced full-size viewer
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: #525659; display: flex; align-items: center; justify-content: center;">
+                    <iframe src="/api/jobs/attachments/${attachmentID}/view"
+                            style="width: 100%; height: 100%; border: none; background: white;"
+                            title="${filename}"
+                            allow="fullscreen"
+                            loading="lazy">
+                    </iframe>
+                </div>
+            `;
+        } else if (mimeType.startsWith('text/') ||
+                   mimeType === 'application/json' ||
+                   mimeType === 'application/xml' ||
+                   mimeType === 'application/yaml' ||
+                   mimeType === 'application/csv' ||
+                   mimeType === 'text/csv' ||
+                   mimeType === 'application/rtf' ||
+                   filename.endsWith('.log') ||
+                   filename.endsWith('.txt') ||
+                   filename.endsWith('.md') ||
+                   filename.endsWith('.rtf') ||
+                   filename.endsWith('.csv') ||
+                   filename.endsWith('.json') ||
+                   filename.endsWith('.yaml') ||
+                   filename.endsWith('.yml') ||
+                   filename.endsWith('.xml') ||
+                   filename.endsWith('.html') ||
+                   filename.endsWith('.htm') ||
+                   filename.endsWith('.css') ||
+                   filename.endsWith('.js') ||
+                   filename.endsWith('.ts') ||
+                   filename.endsWith('.py') ||
+                   filename.endsWith('.java') ||
+                   filename.endsWith('.c') ||
+                   filename.endsWith('.cpp') ||
+                   filename.endsWith('.cs') ||
+                   filename.endsWith('.php') ||
+                   filename.endsWith('.rb') ||
+                   filename.endsWith('.go') ||
+                   filename.endsWith('.rs') ||
+                   filename.endsWith('.sql') ||
+                   filename.endsWith('.sh') ||
+                   filename.endsWith('.bat') ||
+                   filename.endsWith('.cfg') ||
+                   filename.endsWith('.ini') ||
+                   filename.endsWith('.conf')) {
+            // Text/code file preview with syntax highlighting
+            const response = await fetch(`/api/jobs/attachments/${attachmentID}/view`);
+            const text = await response.text();
+            const language = getLanguageFromFilename(filename);
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 16px 24px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3); display: flex; align-items: center; gap: 12px;">
+                        <i class="bi bi-code-slash" style="font-size: 18px; color: var(--primary);"></i>
+                        <div>
+                            <h4 style="margin: 0; font-size: 14px; font-weight: 600;">${filename}</h4>
+                            <p style="margin: 0; font-size: 12px; color: var(--text-muted);">${language} • ${text.split('\n').length} lines</p>
+                        </div>
+                    </div>
+                    <div style="flex: 1; padding: 24px; overflow: auto;">
+                        <pre style="margin: 0; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; word-wrap: break-word; background: var(--surface-0); padding: 20px; border-radius: 8px; border: 1px solid var(--surface-3);">${escapeHtml(text)}</pre>
+                    </div>
+                </div>
+            `;
+        } else if (mimeType.startsWith('video/') ||
+                   filename.endsWith('.mp4') ||
+                   filename.endsWith('.webm') ||
+                   filename.endsWith('.ogg') ||
+                   filename.endsWith('.ogv') ||
+                   filename.endsWith('.mov') ||
+                   filename.endsWith('.avi') ||
+                   filename.endsWith('.mkv') ||
+                   filename.endsWith('.m4v')) {
+            // Video preview - showing download option until attachment API is fixed
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 16px 24px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3); display: flex; align-items: center; gap: 12px;">
+                        <i class="bi bi-play-circle" style="font-size: 18px; color: var(--primary);"></i>
+                        <div>
+                            <h4 style="margin: 0; font-size: 14px; font-weight: 600;">${filename}</h4>
+                            <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Video File</p>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 40px; text-align: center;">
+                        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 50%; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(10px);">
+                            <i class="bi bi-play-circle" style="font-size: 3rem; color: var(--primary);"></i>
+                        </div>
+                        <h3 style="margin-bottom: 12px; font-size: 20px; color: white;">Video Preview</h3>
+                        <p style="margin-bottom: 24px; color: rgba(255, 255, 255, 0.8); max-width: 400px; line-height: 1.5;">Download this ${filename.split('.').pop().toUpperCase()} video to play it in your preferred media player with full quality and controls.</p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                            <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary" style="background: var(--primary); border: none; padding: 12px 24px; font-weight: 600;">
+                                <i class="bi bi-download"></i> Download Video
+                            </button>
+                            <button onclick="closeFilePreviewModal()" class="rc-btn rc-btn-secondary" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 12px 24px;">
+                                <i class="bi bi-x"></i> Close
+                            </button>
+                        </div>
+                        <div style="margin-top: 24px; padding: 16px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 13px; color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px);">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <i class="bi bi-info-circle"></i>
+                                <strong style="color: white;">Video Information</strong>
+                            </div>
+                            <div>Format: ${filename.split('.').pop().toUpperCase()} • Type: ${mimeType || 'Video File'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (mimeType.startsWith('audio/') ||
+                   filename.endsWith('.mp3') ||
+                   filename.endsWith('.wav') ||
+                   filename.endsWith('.ogg') ||
+                   filename.endsWith('.m4a') ||
+                   filename.endsWith('.aac') ||
+                   filename.endsWith('.flac') ||
+                   filename.endsWith('.wma')) {
+            // Enhanced audio preview
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--surface-1), var(--surface-2)); padding: 60px;">
+                    <div style="text-align: center; max-width: 600px;">
+                        <i class="bi bi-music-note-beamed" style="font-size: 5rem; color: var(--primary); margin-bottom: 32px; opacity: 0.8;"></i>
+                        <h3 style="margin-bottom: 24px; font-size: 24px; font-weight: 600; color: var(--text-primary);">${filename}</h3>
+                        <div style="background: var(--surface-0); padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                            <audio controls style="width: 100%; max-width: 500px; height: 54px;">
+                                <source src="/api/jobs/attachments/${attachmentID}/view" type="${mimeType}">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (mimeType.includes('excel') ||
+                   mimeType.includes('spreadsheet') ||
+                   filename.endsWith('.xlsx') ||
+                   filename.endsWith('.xls') ||
+                   mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                   mimeType === 'application/vnd.ms-excel') {
+            // Excel/spreadsheet preview
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 20px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="bi bi-file-spreadsheet" style="font-size: 24px; color: #1D6F42;"></i>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">${filename}</h4>
+                                <p style="margin: 0; font-size: 13px; color: var(--text-muted);">Excel Spreadsheet Preview</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(window.location.origin + '/api/jobs/attachments/' + attachmentID + '/view')}"
+                                style="width: 100%; height: 100%; border: none; background: white;"
+                                title="${filename}"
+                                loading="lazy"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        </iframe>
+                        <div style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+                            <i class="bi bi-file-spreadsheet" style="font-size: 4rem; color: #1D6F42; margin-bottom: 20px; opacity: 0.8;"></i>
+                            <h3 style="margin-bottom: 12px; font-size: 20px;">Spreadsheet Preview Unavailable</h3>
+                            <p style="margin-bottom: 24px; color: var(--text-muted); max-width: 400px;">The online preview service couldn't load this spreadsheet. You can download it to view with Excel or similar application.</p>
+                            <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-download"></i> Download Spreadsheet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (mimeType.includes('presentation') ||
+                   filename.endsWith('.pptx') ||
+                   filename.endsWith('.ppt') ||
+                   mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                   mimeType === 'application/vnd.ms-powerpoint') {
+            // PowerPoint presentation preview
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 20px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="bi bi-file-slides" style="font-size: 24px; color: #D24726;"></i>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">${filename}</h4>
+                                <p style="margin: 0; font-size: 13px; color: var(--text-muted);">PowerPoint Presentation Preview</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(window.location.origin + '/api/jobs/attachments/' + attachmentID + '/view')}"
+                                style="width: 100%; height: 100%; border: none; background: white;"
+                                title="${filename}"
+                                loading="lazy"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        </iframe>
+                        <div style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+                            <i class="bi bi-file-slides" style="font-size: 4rem; color: #D24726; margin-bottom: 20px; opacity: 0.8;"></i>
+                            <h3 style="margin-bottom: 12px; font-size: 20px;">Presentation Preview Unavailable</h3>
+                            <p style="margin-bottom: 24px; color: var(--text-muted); max-width: 400px;">The online preview service couldn't load this presentation. You can download it to view with PowerPoint or similar application.</p>
+                            <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-download"></i> Download Presentation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (mimeType.includes('word') ||
+                   mimeType.includes('document') ||
+                   filename.endsWith('.docx') ||
+                   filename.endsWith('.doc') ||
+                   mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                   mimeType === 'application/msword') {
+            // Word document preview - showing download option until attachment API is fixed
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 20px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="bi bi-file-word" style="font-size: 24px; color: #2B579A;"></i>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">${filename}</h4>
+                                <p style="margin: 0; font-size: 13px; color: var(--text-muted);">Word Document</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+                        <i class="bi bi-file-word" style="font-size: 4rem; color: #2B579A; margin-bottom: 20px; opacity: 0.8;"></i>
+                        <h3 style="margin-bottom: 12px; font-size: 20px;">Word Document Preview</h3>
+                        <p style="margin-bottom: 24px; color: var(--text-muted); max-width: 400px;">Word documents can be viewed by downloading them to your device. The file will open in your default Word application.</p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                            <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-download"></i> Download Document
+                            </button>
+                            <button onclick="closeFilePreviewModal()" class="rc-btn rc-btn-secondary">
+                                <i class="bi bi-x"></i> Close
+                            </button>
+                        </div>
+                        <div style="margin-top: 20px; padding: 16px; background: var(--surface-1); border-radius: 8px; font-size: 13px; color: var(--text-muted);">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>File Information</strong>
+                            </div>
+                            <div>Size: ${(mimeType || '').includes('document') ? 'Word Document' : filename.split('.').pop().toUpperCase()} • Type: ${mimeType || 'Document'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (filename.endsWith('.glb') ||
+                   filename.endsWith('.gltf') ||
+                   filename.endsWith('.obj') ||
+                   filename.endsWith('.stl') ||
+                   filename.endsWith('.fbx') ||
+                   filename.endsWith('.step') ||
+                   filename.endsWith('.stp') ||
+                   filename.endsWith('.dxf')) {
+            // 3D/CAD file preview
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 20px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="bi bi-box" style="font-size: 24px; color: #6366F1;"></i>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">${filename}</h4>
+                                <p style="margin: 0; font-size: 13px; color: var(--text-muted);">3D/CAD File Preview</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+                        <i class="bi bi-box" style="font-size: 4rem; color: #6366F1; margin-bottom: 20px; opacity: 0.8;"></i>
+                        <h3 style="margin-bottom: 12px; font-size: 20px;">3D Model Preview</h3>
+                        <p style="margin-bottom: 24px; color: var(--text-muted); max-width: 400px;">3D file preview requires specialized viewer. Download the file to view in CAD software or 3D viewer.</p>
+                        <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-download"></i> Download 3D File
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else if (mimeType.includes('zip') ||
+                   mimeType.includes('archive') ||
+                   mimeType.includes('compressed') ||
+                   filename.endsWith('.zip') ||
+                   filename.endsWith('.rar') ||
+                   filename.endsWith('.7z') ||
+                   filename.endsWith('.tar') ||
+                   filename.endsWith('.gz') ||
+                   filename.endsWith('.bz2')) {
+            // Archive file preview
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; background: var(--surface-2); display: flex; flex-direction: column;">
+                    <div style="padding: 20px; background: var(--surface-1); border-bottom: 1px solid var(--surface-3);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="bi bi-file-zip" style="font-size: 24px; color: #F59E0B;"></i>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">${filename}</h4>
+                                <p style="margin: 0; font-size: 13px; color: var(--text-muted);">Archive File</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+                        <i class="bi bi-file-zip" style="font-size: 4rem; color: #F59E0B; margin-bottom: 20px; opacity: 0.8;"></i>
+                        <h3 style="margin-bottom: 12px; font-size: 20px;">Archive File</h3>
+                        <p style="margin-bottom: 24px; color: var(--text-muted); max-width: 400px;">Archive contents cannot be previewed directly. Download the file to extract and view contents.</p>
+                        <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-download"></i> Download Archive
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Unsupported file type - show download option
+            const fileIcon = getJobDetailsFileTypeIcon(mimeType, filename);
+            content.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface-1); padding: 60px;">
+                    <div style="text-align: center; max-width: 500px;">
+                        <i class="${fileIcon}" style="font-size: 6rem; color: var(--primary); margin-bottom: 32px; opacity: 0.8;"></i>
+                        <h3 style="margin-bottom: 16px; font-size: 24px; font-weight: 600; color: var(--text-primary); word-break: break-word;">${filename}</h3>
+                        <p style="margin-bottom: 32px; color: var(--text-muted); font-size: 16px;">Preview not available for this file type</p>
+                        <button onclick="downloadCurrentPreviewFile()" class="rc-btn rc-btn-primary" style="padding: 12px 24px; font-size: 16px;">
+                            <i class="bi bi-download"></i> Download File
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Get file type icon for preview
+    function getJobDetailsFileTypeIcon(mimeType, filename) {
+        if (mimeType.startsWith('image/')) return 'bi bi-file-image';
+        if (mimeType === 'application/pdf') return 'bi bi-file-pdf';
+        if (mimeType.startsWith('text/')) return 'bi bi-file-text';
+        if (mimeType.startsWith('video/')) return 'bi bi-file-play';
+        if (mimeType.startsWith('audio/')) return 'bi bi-file-music';
+        if (mimeType.includes('zip') || mimeType.includes('archive')) return 'bi bi-file-zip';
+        if (mimeType.includes('excel') || filename.endsWith('.xlsx') || filename.endsWith('.xls')) return 'bi bi-file-spreadsheet';
+        if (mimeType.includes('word') || filename.endsWith('.docx') || filename.endsWith('.doc')) return 'bi bi-file-word';
+        if (mimeType.includes('powerpoint') || filename.endsWith('.pptx') || filename.endsWith('.ppt')) return 'bi bi-file-slides';
+        if (filename.endsWith('.glb') || filename.endsWith('.gltf') || filename.endsWith('.obj') || filename.endsWith('.stl')) return 'bi bi-box';
+        return 'bi bi-file-earmark';
+    }
+
+    // Get language from filename for syntax highlighting
+    function getLanguageFromFilename(filename) {
+        const ext = filename.toLowerCase().split('.').pop();
+        const languages = {
+            'js': 'JavaScript',
+            'ts': 'TypeScript',
+            'jsx': 'React JSX',
+            'tsx': 'React TSX',
+            'py': 'Python',
+            'java': 'Java',
+            'c': 'C',
+            'cpp': 'C++',
+            'cc': 'C++',
+            'cxx': 'C++',
+            'cs': 'C#',
+            'php': 'PHP',
+            'rb': 'Ruby',
+            'go': 'Go',
+            'rs': 'Rust',
+            'html': 'HTML',
+            'htm': 'HTML',
+            'css': 'CSS',
+            'scss': 'SCSS',
+            'sass': 'Sass',
+            'less': 'Less',
+            'json': 'JSON',
+            'xml': 'XML',
+            'yaml': 'YAML',
+            'yml': 'YAML',
+            'sql': 'SQL',
+            'sh': 'Shell',
+            'bash': 'Bash',
+            'bat': 'Batch',
+            'md': 'Markdown',
+            'txt': 'Text',
+            'log': 'Log',
+            'cfg': 'Config',
+            'ini': 'INI',
+            'conf': 'Config',
+            'csv': 'CSV',
+            'rtf': 'Rich Text'
+        };
+        return languages[ext] || 'Text';
+    }
+
+    // Apply adaptive modal sizing based on file type
+    function applyAdaptiveModalSizing(modal, mimeType, filename) {
+        const modalContent = modal.querySelector('#filePreviewModalContent');
+
+        // Reset to default first
+        modalContent.style.width = '1400px';
+        modalContent.style.height = '90vh';
+        modalContent.style.maxWidth = '95vw';
+        modalContent.style.maxHeight = '98vh';
+
+        if (mimeType === 'application/pdf' || filename.endsWith('.pdf')) {
+            // PDF documents - optimize for A4 vertical reading
+            modalContent.style.width = '900px';
+            modalContent.style.height = '95vh';
+            modalContent.style.maxWidth = '90vw';
+            modalContent.style.maxHeight = '98vh';
+        } else if (mimeType.startsWith('image/') || isImageFile(filename)) {
+            // Images - will be handled dynamically after loading to detect aspect ratio
+            modalContent.style.width = '95vw';
+            modalContent.style.height = '95vh';
+            modalContent.style.maxWidth = '95vw';
+            modalContent.style.maxHeight = '98vh';
+        } else if (mimeType.startsWith('video/') || isVideoFile(filename)) {
+            // Videos - optimize for video aspect ratios
+            modalContent.style.width = '95vw';
+            modalContent.style.height = '85vh';
+            modalContent.style.maxWidth = '95vw';
+            modalContent.style.maxHeight = '95vh';
+        } else if (is3DFile(filename) || isArchiveFile(filename)) {
+            // 3D models and archives - maximize space
+            modalContent.style.width = '95vw';
+            modalContent.style.height = '95vh';
+            modalContent.style.maxWidth = '95vw';
+            modalContent.style.maxHeight = '98vh';
+        } else if (isOfficeFile(mimeType, filename)) {
+            // Office documents - optimize for document viewing
+            modalContent.style.width = '95vw';
+            modalContent.style.height = '95vh';
+            modalContent.style.maxWidth = '95vw';
+            modalContent.style.maxHeight = '98vh';
+        } else if (isCodeFile(filename)) {
+            // Code files - wide format for better readability
+            modalContent.style.width = '95vw';
+            modalContent.style.height = '90vh';
+            modalContent.style.maxWidth = '95vw';
+            modalContent.style.maxHeight = '95vh';
+        }
+    }
+
+    // Helper functions for file type detection
+    function isImageFile(filename) {
+        return /\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff|ico)$/i.test(filename);
+    }
+
+    function isVideoFile(filename) {
+        return /\.(mp4|webm|ogg|ogv|mov|avi|mkv|m4v)$/i.test(filename);
+    }
+
+    function is3DFile(filename) {
+        return /\.(glb|gltf|obj|stl|fbx|step|stp|dxf)$/i.test(filename);
+    }
+
+    function isArchiveFile(filename) {
+        return /\.(zip|rar|7z|tar|gz|bz2)$/i.test(filename);
+    }
+
+    function isOfficeFile(mimeType, filename) {
+        return mimeType.includes('excel') || mimeType.includes('spreadsheet') ||
+               mimeType.includes('presentation') || mimeType.includes('powerpoint') ||
+               /\.(xlsx|xls|pptx|ppt)$/i.test(filename);
+    }
+
+    function isCodeFile(filename) {
+        return /\.(html|htm|css|js|ts|jsx|tsx|py|java|c|cpp|cs|php|rb|go|rs|sql|sh|bat|json|yaml|yml|xml|cfg|ini|conf)$/i.test(filename);
+    }
+
+    // Adapt modal size for images based on aspect ratio
+    function adaptModalForImage(width, height) {
+        const modal = document.getElementById('filePreviewModal');
+        const modalContent = modal.querySelector('#filePreviewModalContent');
+        const aspectRatio = width / height;
+
+        if (aspectRatio > 1.5) {
+            // Landscape image - prioritize width
+            modalContent.style.width = '95vw';
+            modalContent.style.height = 'auto';
+            modalContent.style.maxHeight = '95vh';
+        } else if (aspectRatio < 0.75) {
+            // Portrait image - prioritize height
+            modalContent.style.width = 'auto';
+            modalContent.style.height = '95vh';
+            modalContent.style.maxWidth = '90vw';
+        } else {
+            // Square-ish image - balanced approach
+            modalContent.style.width = '85vw';
+            modalContent.style.height = '90vh';
+            modalContent.style.maxWidth = '95vw';
+            modalContent.style.maxHeight = '95vh';
+        }
+    }
+
+    // Get image orientation description
+    function getImageOrientation(width, height) {
+        const aspectRatio = width / height;
+        if (aspectRatio > 1.3) return 'Landscape';
+        if (aspectRatio < 0.8) return 'Portrait';
+        return 'Square';
+    }
+
+    // Maximize modal size for specific content types
+    function maximizeModalSize() {
+        const modal = document.getElementById('filePreviewModal');
+        const modalContent = modal.querySelector('#filePreviewModalContent');
+        modalContent.style.width = '98vw';
+        modalContent.style.height = '96vh';
+        modalContent.style.maxWidth = '98vw';
+        modalContent.style.maxHeight = '98vh';
+        modalContent.style.margin = '1vh auto';
+    }
+
+    // Adapt modal for generic files
+    function adaptModalForGenericFile() {
+        const modal = document.getElementById('filePreviewModal');
+        const modalContent = modal.querySelector('#filePreviewModalContent');
+        modalContent.style.width = '800px';
+        modalContent.style.height = '70vh';
+        modalContent.style.maxWidth = '90vw';
+        modalContent.style.maxHeight = '85vh';
+    }
+
+    // Toggle image zoom functionality
+    function toggleImageZoom(img) {
+        if (img.style.transform) {
+            img.style.transform = '';
+            img.style.cursor = 'zoom-in';
+            img.style.position = 'static';
+            img.style.zIndex = 'auto';
+        } else {
+            img.style.transform = 'scale(2)';
+            img.style.cursor = 'zoom-out';
+            img.style.position = 'relative';
+            img.style.zIndex = '1000';
+        }
+    }
+
+    // Escape HTML for text preview
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return '';
+        return unsafe
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // Hide file preview modal
+    function hideFilePreviewModal() {
+        const modal = document.getElementById('filePreviewModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        currentPreviewFileData = null;
+    }
+
+    // Download current file
+    function downloadCurrentPreviewFile() {
+        if (currentPreviewFileData) {
+            window.open(`/api/jobs/attachments/${currentPreviewFileData.attachmentID}/download`, '_blank');
+        }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const fileModal = document.getElementById('filePreviewModal');
+            const jobModal = document.getElementById('jobDetailsModal');
+            if (fileModal && fileModal.style.display !== 'none') {
+                hideFilePreviewModal();
+            } else if (jobModal && jobModal.style.display !== 'none') {
+                closeJobModal();
+            }
+        }
+    });
+
+    // Setup drag and drop for edit job form
+    function setupEditJobDragAndDrop() {
+        const uploadArea = document.querySelector('#editAttachmentsSection .file-upload-area');
+        if (!uploadArea) return;
+
+        // Remove existing listeners first
+        uploadArea.removeEventListener('dragover', handleEditJobDragOver);
+        uploadArea.removeEventListener('dragleave', handleEditJobDragLeave);
+        uploadArea.removeEventListener('drop', handleEditJobDrop);
+
+        // Add drag and drop event listeners
+        uploadArea.addEventListener('dragover', handleEditJobDragOver);
+        uploadArea.addEventListener('dragleave', handleEditJobDragLeave);
+        uploadArea.addEventListener('drop', handleEditJobDrop);
+    }
+
+    function handleEditJobDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const uploadArea = e.currentTarget;
+        uploadArea.style.backgroundColor = 'var(--surface-2)';
+        uploadArea.style.borderColor = 'var(--primary)';
+        uploadArea.style.transform = 'scale(1.02)';
+    }
+
+    function handleEditJobDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const uploadArea = e.currentTarget;
+        uploadArea.style.backgroundColor = '';
+        uploadArea.style.borderColor = 'var(--surface-3)';
+        uploadArea.style.transform = '';
+    }
+
+    function handleEditJobDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const uploadArea = e.currentTarget;
+        uploadArea.style.backgroundColor = '';
+        uploadArea.style.borderColor = 'var(--surface-3)';
+        uploadArea.style.transform = '';
+
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) {
+            editJobSelectedFiles = editJobSelectedFiles.concat(files);
+            displayEditJobSelectedFiles();
+        }
+    }
+
+    </script>
+    
+    <!-- Device Tree Styles for Edit Modal -->
+    <style>
+        /* Job Device Count Button in View Modal */
+        .job-device-count-button {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: rgba(0, 174, 199, 0.2);
+            color: var(--info);
+            border: 1px solid rgba(0, 174, 199, 0.3);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+        
+        .job-device-count-button:hover {
+            background: rgba(0, 174, 199, 0.3);
+            border-color: var(--info);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 174, 199, 0.2);
+        }
+        
+        /* Toast Notifications */
+        .rc-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .rc-toast-success {
+            background: var(--success);
+        }
+        
+        .rc-toast-error {
+            background: var(--error);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Device Count Button Styling - Regular text size with slight highlighting */
+        .device-count-button {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+            color: var(--info);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: inherit;
+            font-family: inherit;
+            font-weight: 500;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+
+        .device-count-button:hover {
+            background: var(--info);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .device-count-button:active {
+            transform: translateY(0);
+        }
+
+        /* Assigned devices styling in edit modal */
+        .device-count-badge {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: var(--text-primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .assigned-device-item {
+            transition: all 0.2s ease;
+        }
+
+        .assigned-device-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-price-input {
+            text-align: right;
+        }
+
+        .device-price-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+            font-weight: 500;
+        }
+
+        .device-price-input:focus::placeholder {
+            opacity: 0.3;
+            transition: opacity 0.2s ease;
+        }
+        .device-tree-container {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .tree-category {
+            margin-bottom: var(--space-md);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-md);
+            background: var(--surface-1);
+        }
+        
+        .tree-category-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border-radius: var(--radius-md);
+        }
+        
+        .tree-category-header:hover {
+            background: var(--surface-2);
+        }
+        
+        .tree-chevron {
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .tree-chevron.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .tree-icon {
+            color: var(--accent-electric);
+            font-size: 1.1rem;
+        }
+        
+        .tree-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        
+        .tree-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--surface-3);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+        }
+        
+        .tree-device {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm);
+            margin: var(--space-xs) 0;
+            background: var(--surface-1);
+            border: 1px solid var(--surface-2);
+            border-radius: var(--radius-sm);
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+        
+        .tree-device:hover {
+            background: var(--surface-2);
+            border-color: var(--accent-electric);
+        }
+        
+        .tree-device.available {
+            border-color: var(--success);
+        }
+        
+        .tree-device.unavailable {
+            opacity: 0.5;
+            background: var(--surface-1);
+            border-color: var(--error);
+            cursor: not-allowed;
+        }
+        
+        .tree-device.selected {
+            background: #f0f0f0;
+            border-color: #dc3545;
+            opacity: 0.7;
+            color: #6c757d;
+        }
+        
+        [data-theme="dark"] .tree-device.selected {
+            background: #2a2a2a;
+            border-color: #dc3545;
+            opacity: 0.8;
+            color: #9ca3af;
+        }
+        
+        .device-info {
+            flex: 1;
+        }
+        
+        .device-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .tree-device.selected .device-name {
+            color: #6c757d;
+        }
+        
+        [data-theme="dark"] .tree-device.selected .device-name {
+            color: #9ca3af;
+        }
+        
+        .device-details {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.85rem;
+        }
+        
+        .device-id {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            background: var(--surface-2);
+            padding: 1px 4px;
+            border-radius: 2px;
+        }
+        
+        .tree-device.selected .device-id {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        
+        .device-status {
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .device-status-free {
+            background: var(--success);
+            color: white;
+        }
+        
+        .device-status-assigned {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .device-status-maintenance {
+            background: var(--error);
+            color: white;
+        }
+        
+        .tree-content {
+            padding-left: var(--space-lg);
+            border-left: 2px solid var(--surface-3);
+            margin-left: var(--space-lg);
+        }
+        
+        .tree-subcategory, .tree-subbiercategory {
+            margin: var(--space-sm) 0;
+            border: 1px solid var(--surface-2);
+            border-radius: var(--radius-sm);
+            background: var(--surface-0);
+        }
+        
+        .tree-subcategory-header, .tree-subbiercategory-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border-radius: var(--radius-sm);
+        }
+        
+        .tree-subcategory-header:hover, .tree-subbiercategory-header:hover {
+            background: var(--surface-1);
+        }
+        
+        .selected-device-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: var(--accent-electric);
+            color: white;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+        }
+        
+        .selected-device-badge .remove-device {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            margin-left: var(--space-xs);
+        }
+        
+        .category-icon {
+            color: var(--accent-electric);
+        }
+        
+        .subcategory-icon {
+            color: var(--accent-purple);
+        }
+        
+        .subbiercategory-icon {
+            color: var(--accent-coral);
+        }
+    </style>
+</body>
+</html>
