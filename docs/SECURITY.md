@@ -1,76 +1,321 @@
-# RentalCore Security Guide
+# 🔐 SECURITY.md — RentalCore Security Policy
 
-## Overview
-RentalCore implements enterprise-grade security features to protect your rental management data.
+<div align="center">
 
-## Authentication & Authorization
+<img width="220" src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" />
 
-### Multi-Factor Authentication (2FA)
-- WebAuthn support for passwordless authentication
-- Time-based One-Time Password (TOTP) support
-- SMS verification for additional security
+# 🛡️ RentalCore Security Policy
 
-### Role-Based Access Control (RBAC)
-- **Admin**: Full system access
-- **Manager**: Job and device management
-- **User**: Limited read access
+### Política oficial de seguridad y reporte de vulnerabilidades 🚨
 
-## Data Protection
+<p align="center">
+  <b>RentalCore</b> se compromete a mantener una plataforma segura, estable y protegida para todos los usuarios, desarrolladores y administradores.
+</p>
 
-### Encryption
-- AES-256 encryption for sensitive data
-- TLS 1.3 for data in transit
-- Encrypted database credentials
+<p align="center">
+  <img src="https://img.shields.io/badge/Security-Enterprise-red?style=for-the-badge&logo=shield&logoColor=white">
+  <img src="https://img.shields.io/badge/Docker-SecureDeployment-2496ED?style=for-the-badge&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/Encryption-AES256-success?style=for-the-badge">
+  <img src="https://img.shields.io/badge/WebAuthn-2FA-blueviolet?style=for-the-badge">
+  <img src="https://img.shields.io/badge/OpenSource-SecurityPolicy-success?style=for-the-badge">
+</p>
 
-### Password Security
-- Minimum 8 characters
-- Must include uppercase, lowercase, number, special character
-- Password hashing with bcrypt
-- Session timeout after 1 hour of inactivity
+<p align="center">
+  <a href="#-supported-versions">Supported Versions</a> •
+  <a href="#-reporting-a-vulnerability">Reporting</a> •
+  <a href="#-security-features">Security Features</a> •
+  <a href="#-best-practices">Best Practices</a>
+</p>
 
-## Security Features
+</div>
 
-### Input Validation
-- SQL injection prevention
-- XSS protection
-- CSRF tokens
-- Input sanitization
+---
 
-### Network Security
-- HTTPS/TLS termination
-- CORS protection
-- Rate limiting
-- IP whitelisting support
+# 🌌 About Security
 
-## Compliance
+RentalCore fue diseñado siguiendo principios modernos de seguridad para proteger:
 
-### GDPR Features
-- Data retention policies
-- Right to be forgotten
-- Data export functionality
-- Privacy controls
+* 👥 Usuarios
+* 📦 Equipos y dispositivos
+* 💳 Información financiera
+* 🔐 Credenciales
+* ☁️ Infraestructura Docker
+* 📊 Datos empresariales
 
-### Audit Logging
-- All user actions logged
-- Failed login attempts tracked
-- Data changes audited
-- Security event monitoring
+La seguridad es una prioridad central del proyecto.
 
-## Best Practices
+---
 
-1. **Change Default Credentials**: Always change the default admin password
-2. **Use Strong Passwords**: Enforce password complexity
-3. **Regular Updates**: Keep Docker images updated
-4. **Secure Headers**: Implement security headers in reverse proxy
-5. **Database Security**: Use dedicated database user with minimal privileges
-6. **Backup Encryption**: Encrypt all backup files
+# ✅ Supported Versions
 
-## Security Checklist
+Las siguientes versiones actualmente reciben soporte y actualizaciones de seguridad:
 
-- [ ] Changed default admin password
-- [ ] Configured HTTPS/TLS
-- [ ] Set up firewall rules
-- [ ] Configured secure headers
-- [ ] Enabled audit logging
-- [ ] Set up monitoring alerts
-- [ ] Configured backup encryption
+| Version | Supported  |
+| ------- | ---------- |
+| 2.x     | ✅ Yes      |
+| 1.4.x   | ✅ Yes      |
+| 1.3.x   | ⚠️ Limited |
+| < 1.3   | ❌ No       |
+
+---
+
+# 🚨 Reporting a Vulnerability
+
+Si encuentras una vulnerabilidad de seguridad, por favor repórtala de manera responsable.
+
+## 📩 Cómo reportar
+
+Enviar información detallada incluyendo:
+
+* 🐞 Tipo de vulnerabilidad
+* 📍 Endpoint o componente afectado
+* 🔁 Pasos para reproducir
+* 💥 Impacto potencial
+* 📸 Evidencia o screenshots
+* 🧠 Posible solución (opcional)
+
+---
+
+## 🔒 Política de divulgación responsable
+
+Por favor:
+
+* ❌ No divulgar públicamente la vulnerabilidad
+* ❌ No explotar sistemas en producción
+* ❌ No acceder a información de terceros
+* ✅ Reportar primero al equipo de desarrollo
+* ✅ Esperar confirmación antes de publicar detalles
+
+---
+
+# 🛡️ Security Features
+
+## 🔐 Authentication & Access
+
+* Secure login system
+* Password hashing
+* Session expiration
+* Role-Based Access Control (RBAC)
+* Two-Factor Authentication (2FA)
+* WebAuthn support
+
+---
+
+## 🔒 Data Protection
+
+* AES-256 encryption
+* Secure environment variables
+* HTTPS/TLS support
+* Secure cookies
+* Session isolation
+* Database protection
+
+---
+
+## 🚫 Attack Prevention
+
+RentalCore incluye protección contra:
+
+* SQL Injection
+* Cross-Site Scripting (XSS)
+* Cross-Site Request Forgery (CSRF)
+* Brute-force attacks
+* Session hijacking
+* Unauthorized access
+
+---
+
+## ☁️ Docker Security
+
+### Buenas prácticas implementadas
+
+* Containers aislados
+* Variables protegidas
+* Volúmenes seguros
+* Reverse proxy recomendado
+* Read-only filesystem opcional
+* Health checks integrados
+
+---
+
+# ⚙️ Security Configuration
+
+## 🔑 Variables sensibles
+
+Guardar siempre en:
+
+```bash
+.env
+```
+
+Nunca compartir:
+
+```bash
+DB_PASSWORD
+ENCRYPTION_KEY
+JWT_SECRET
+SMTP_PASSWORD
+```
+
+---
+
+## 🔐 Generar clave segura
+
+```bash
+openssl rand -hex 16
+```
+
+---
+
+# 🌐 HTTPS Recommendations
+
+## ✅ Producción
+
+Se recomienda:
+
+* HTTPS obligatorio
+* Certificados SSL válidos
+* Reverse proxy seguro
+* Headers de seguridad
+
+---
+
+## 🔒 Ejemplo Nginx
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name rentalcore.example.com;
+
+    ssl_certificate /etc/ssl/cert.pem;
+    ssl_certificate_key /etc/ssl/key.pem;
+
+    location / {
+        proxy_pass http://localhost:8080;
+    }
+}
+```
+
+---
+
+# 📊 Monitoring & Auditing
+
+## 📈 Logs monitoreados
+
+* Login attempts
+* Failed authentications
+* API requests
+* User activity
+* Device access
+* System errors
+
+---
+
+## ❤️ Health Check
+
+```bash
+curl http://localhost:8080/health
+```
+
+---
+
+# 💾 Backup Recommendations
+
+## 📦 Backup de uploads
+
+```bash
+docker run --rm \
+-v rentalcore_uploads:/data \
+-v $(pwd)/backup:/backup \
+alpine tar czf /backup/uploads.tar.gz -C /data .
+```
+
+---
+
+## 🗄️ Backup MySQL
+
+```bash
+mysqldump -u root -p rentalcore > backup.sql
+```
+
+---
+
+# ⚠️ Security Best Practices
+
+## ✅ Recomendaciones
+
+* 🔒 Usar HTTPS siempre
+* 🔑 Rotar credenciales periódicamente
+* 📊 Revisar logs constantemente
+* ⚡ Mantener imágenes Docker actualizadas
+* 💾 Crear backups automáticos
+* 🛡️ Activar firewall
+* 🚫 Deshabilitar acceso root
+* 🔄 Actualizar dependencias
+
+---
+
+# 🚨 Known Limitations
+
+Aunque RentalCore implementa múltiples capas de seguridad:
+
+* Ningún sistema es 100% invulnerable
+* Las configuraciones incorrectas pueden comprometer seguridad
+* Los administradores deben mantener actualizados sus servidores
+* Las dependencias externas deben monitorearse constantemente
+
+---
+
+# 🤝 Security Contributions
+
+Las mejoras de seguridad son bienvenidas ❤️
+
+## Cómo contribuir
+
+1. Fork del proyecto
+
+```bash
+git checkout -b feature/security-improvements
+```
+
+2. Commit
+
+```bash
+git commit -m "🔐 Security improvements"
+```
+
+3. Push
+
+```bash
+git push origin feature/security-improvements
+```
+
+4. Pull Request 🚀
+
+---
+
+# 👨‍💻 Maintainer
+
+<div align="center">
+
+## Isai Reyes — Full Stack Developer
+
+Especializado en DevOps, Docker, seguridad web e infraestructura empresarial 🚀
+
+</div>
+
+---
+
+# 📜 License
+
+Este proyecto está bajo licencia MIT.
+
+La política de seguridad puede actualizarse en futuras versiones del proyecto.
+
+---
+
+<div align="center">
+
+### 🛡️ RentalCore Security Policy — seguridad empresarial moderna 🚀
+
+</div>
