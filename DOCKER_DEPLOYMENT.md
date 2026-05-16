@@ -132,7 +132,7 @@ El objetivo es facilitar un despliegue profesional, moderno y escalable utilizan
 # 📂 Estructura de despliegue
 
 ```bash
-rentalcore-deployment/
+PlataformaGestionRentaEquipos/
 │
 ├── docker-compose.prod.yml
 ├── .env
@@ -199,44 +199,22 @@ docker build -t nbt4/rentalcore:v1.0.0 .
 docker push nbt4/rentalcore:latest
 ```
 
----
 
-## 5️⃣ Publicar versión
-
-```bash
-docker push nbt4/rentalcore:v1.0.0
-```
 
 ---
 
-## 6️⃣ Verificar publicación
 
-Abrir:
-
-```bash
-https://hub.docker.com/r/nbt4/rentalcore
-```
-
----
 
 # ⚡ Despliegue desde Docker Hub
 
 ## 📥 Descargar archivos
 
 ```bash
-mkdir rentalcore-deployment
-cd rentalcore-deployment
+mkdir PlataformaGestionRentaEquipos
+cd PlataformaGestionRentaEquipos
 ```
 
----
 
-## 📦 Descargar configuración
-
-```bash
-wget https://raw.githubusercontent.com/nbt4/rentalcore/main/docker-compose.prod.yml
-
-wget https://raw.githubusercontent.com/nbt4/rentalcore/main/.env.template
-```
 
 ---
 
