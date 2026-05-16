@@ -186,7 +186,7 @@ Además, la plataforma incorpora tecnologías modernas como WebAssembly, escaneo
 # 📂 Estructura del proyecto
 
 ```bash
-RentalCore/
+PlataformaGestionRentaEquipos/
 │
 ├── cmd/server/               # Punto de entrada
 ├── internal/
@@ -228,7 +228,7 @@ RentalCore/
 ## 1️⃣ Clonar repositorio
 
 ```bash
-git clone https://github.com/isairey/RentalCore.git
+git clone https://github.com/isairey/PlataformaGestionRentaEquipos.git
 ```
 
 ---
