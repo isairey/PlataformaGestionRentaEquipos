@@ -1,291 +1,575 @@
-# 🐳 RentalCore Docker Hub Deployment Guide
+<div align="center">
 
-This guide explains how to build, push to Docker Hub, and deploy RentalCore on any system using Docker.
+<img width="220" src="https://cdn-icons-png.flaticon.com/512/919/919853.png" />
 
-## 📋 Table of Contents
-1. [Prerequisites](#prerequisites)
-2. [Building and Pushing to Docker Hub](#building-and-pushing-to-docker-hub)
-3. [Deploying from Docker Hub](#deploying-from-docker-hub)
-4. [Configuration](#configuration)
-5. [Production Deployment](#production-deployment)
-6. [Troubleshooting](#troubleshooting)
+# 🐳 RentalCore Docker Deployment Guide
+
+### Guía profesional de despliegue con Docker Hub 🚀
+
+<p align="center">
+  <b>RentalCore Docker Deployment Guide</b> es una guía completa para construir, publicar y desplegar la plataforma RentalCore utilizando Docker y Docker Hub en entornos profesionales y de producción.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Docker-Deployment-2496ED?style=for-the-badge&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/DockerHub-Registry-0db7ed?style=for-the-badge&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/Nginx-ReverseProxy-009639?style=for-the-badge&logo=nginx&logoColor=white">
+  <img src="https://img.shields.io/badge/Linux-Production-FCC624?style=for-the-badge&logo=linux&logoColor=black">
+  <img src="https://img.shields.io/badge/OpenSource-CloudReady-success?style=for-the-badge">
+</p>
+
+<p align="center">
+  <a href="#-acerca-de-la-guía">Acerca</a> •
+  <a href="#-requisitos">Requisitos</a> •
+  <a href="#-despliegue">Despliegue</a> •
+  <a href="#-configuración">Configuración</a> •
+  <a href="#-producción">Producción</a>
+</p>
+
+</div>
 
 ---
 
-## 🔧 Prerequisites
+# 🌌 Acerca de la guía
 
-### For Building & Pushing:
-- Docker installed and running
-- Docker Hub account
-- Access to this source code
+Esta guía explica cómo:
 
-### For Deployment Only:
-- Docker and Docker Compose installed
-- Access to your MySQL database
-- The deployment files (docker-compose.prod.yml and .env)
+- 🐳 Construir imágenes Docker
+- ☁️ Publicar contenedores en Docker Hub
+- 🚀 Desplegar RentalCore en producción
+- 🔐 Configurar seguridad y SSL
+- 📦 Gestionar backups y volúmenes
+- 📊 Monitorear contenedores
+- ⚡ Escalar la plataforma
+
+El objetivo es facilitar un despliegue profesional, moderno y escalable utilizando Docker Compose y contenedores optimizados.
 
 ---
 
-## 🏗️ Building and Pushing to Docker Hub
+# ✨ Características del despliegue
 
-### Step 1: Login to Docker Hub
+## 🐳 Docker Ready
+
+- 📦 Imágenes optimizadas
+- ⚡ Contenedores ligeros
+- 🔄 Actualizaciones rápidas
+- 🛡️ Entornos aislados
+- 🚀 Deploy multiplataforma
+
+---
+
+## ☁️ Docker Hub Integration
+
+- 📤 Push automático
+- 📥 Pull de versiones
+- 🏷️ Versionado semántico
+- 🔄 Actualizaciones continuas
+- 🌍 Distribución global
+
+---
+
+## 🔐 Seguridad empresarial
+
+- 🔒 Variables seguras `.env`
+- 🌐 HTTPS y SSL
+- 🛡️ Reverse Proxy
+- 🔑 Claves de encriptación
+- ⚠️ Protección de credenciales
+
+---
+
+## 📊 Producción y monitoreo
+
+- 📈 Logs en tiempo real
+- ❤️ Health checks
+- 💾 Backups automáticos
+- 🔄 Reinicio de servicios
+- 📡 Supervisión del sistema
+
+---
+
+# 🛠️ Tecnologías utilizadas
+
+## ⚙️ Infraestructura
+
+<p>
+  <img src="https://skillicons.dev/icons?i=docker,linux,nginx,bash" />
+</p>
+
+- Docker
+- Docker Compose
+- Linux
+- Nginx
+- Bash
+
+---
+
+## 🗄️ Base de datos
+
+<p>
+  <img src="https://skillicons.dev/icons?i=mysql" />
+</p>
+
+- MySQL
+- MariaDB
+- Persistencia mediante volúmenes
+
+---
+
+## ☁️ DevOps y monitoreo
+
+<p>
+  <img src="https://skillicons.dev/icons?i=github" />
+</p>
+
+- Docker Hub
+- Certbot
+- SSL/TLS
+- Logs centralizados
+
+---
+
+# 📂 Estructura de despliegue
+
+```bash
+rentalcore-deployment/
+│
+├── docker-compose.prod.yml
+├── .env
+├── .env.template
+├── backups/
+│
+├── uploads/
+├── logs/
+└── README.md
+```
+
+---
+
+# 📋 Requisitos
+
+## 🖥️ Para construir y publicar
+
+- Docker instalado
+- Cuenta Docker Hub
+- Código fuente RentalCore
+- Acceso a internet
+
+---
+
+## ☁️ Para despliegue
+
+- Docker Compose
+- MySQL o MariaDB
+- Linux Server / VPS
+- Dominio configurado
+- Certificados SSL
+
+---
+
+# 🚀 Construcción y publicación
+
+## 1️⃣ Iniciar sesión en Docker Hub
+
 ```bash
 docker login
 ```
-Enter your Docker Hub username and password.
-
-### Step 2: Build the Image
-Replace `nbt4` with your actual Docker Hub username:
-
-```bash
-# Build the image
-docker build -t nbt4/rentalcore:latest .
-
-# Optional: Tag with version number
-docker build -t nbt4/rentalcore:v1.0.0 .
-```
-
-### Step 3: Push to Docker Hub
-```bash
-# Push latest tag
-docker push nbt4/rentalcore:latest
-
-# Push version tag (if created)
-docker push nbt4/rentalcore:v1.0.0
-```
-
-### Step 4: Verify Upload
-Visit `https://hub.docker.com/r/nbt4/rentalcore` to confirm your image is uploaded.
 
 ---
 
-## 🚀 Deploying from Docker Hub
+## 2️⃣ Construir imagen
 
-### Step 1: Download Deployment Files
-On your target server, create a new directory and download these files:
-- `docker-compose.prod.yml`
-- `.env.template`
+```bash
+docker build -t nbt4/rentalcore:latest .
+```
+
+---
+
+## 3️⃣ Crear versión opcional
+
+```bash
+docker build -t nbt4/rentalcore:v1.0.0 .
+```
+
+---
+
+## 4️⃣ Publicar imagen
+
+```bash
+docker push nbt4/rentalcore:latest
+```
+
+---
+
+## 5️⃣ Publicar versión
+
+```bash
+docker push nbt4/rentalcore:v1.0.0
+```
+
+---
+
+## 6️⃣ Verificar publicación
+
+Abrir:
+
+```bash
+https://hub.docker.com/r/nbt4/rentalcore
+```
+
+---
+
+# ⚡ Despliegue desde Docker Hub
+
+## 📥 Descargar archivos
 
 ```bash
 mkdir rentalcore-deployment
 cd rentalcore-deployment
+```
 
-# Download files (replace with your actual URLs)
+---
+
+## 📦 Descargar configuración
+
+```bash
 wget https://raw.githubusercontent.com/nbt4/rentalcore/main/docker-compose.prod.yml
+
 wget https://raw.githubusercontent.com/nbt4/rentalcore/main/.env.template
 ```
 
-### Step 2: Configure Environment
-```bash
-# Copy template to create your configuration
-cp .env.template .env
+---
 
-# Edit the configuration
+## ⚙️ Configurar variables
+
+```bash
+cp .env.template .env
 nano .env
 ```
 
-**Important**: Update the Docker image name in `docker-compose.prod.yml`:
-```yaml
-services:
-  rentalcore:
-    image: nbt4/rentalcore:latest
-```
+---
 
-### Step 3: Configure Your Database
-Edit `.env` file with your database settings:
+## 🗄️ Configurar base de datos
+
+Editar:
+
 ```env
-# Database Configuration
-DB_HOST=your-mysql-host.com
+DB_HOST=your-mysql-host
 DB_PORT=3306
-DB_NAME=your-database-name
-DB_USERNAME=your-db-username
-DB_PASSWORD=your-secure-password
-
-# Security (REQUIRED)
-ENCRYPTION_KEY=your-32-character-encryption-key-here
+DB_NAME=rentalcore
+DB_USERNAME=root
+DB_PASSWORD=password
 ```
 
-### Step 4: Deploy
+---
+
+## 🔐 Configurar seguridad
+
+```env
+ENCRYPTION_KEY=your-32-character-key
+```
+
+---
+
+## 🚀 Ejecutar contenedores
+
 ```bash
-# Start the application
 docker-compose -f docker-compose.prod.yml up -d
+```
 
-# Check status
+---
+
+## 📊 Verificar estado
+
+```bash
 docker-compose -f docker-compose.prod.yml ps
+```
 
-# View logs
+---
+
+## 📋 Ver logs
+
+```bash
 docker-compose -f docker-compose.prod.yml logs -f rentalcore
 ```
 
 ---
 
-## ⚙️ Configuration
+# ⚙️ Configuración avanzada
 
-### Required Environment Variables
+## 📧 Variables opcionales
+
 ```env
-# Database (Required)
-DB_HOST=your-database-host
-DB_NAME=your-database-name
-DB_USERNAME=your-db-user
-DB_PASSWORD=your-db-password
-
-# Security (Required)
-ENCRYPTION_KEY=generate-a-32-character-key
-```
-
-### Optional Environment Variables
-```env
-# Application
-APP_PORT=8080
-GIN_MODE=release
-
-# Email (for notifications and invoices)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USERNAME=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
+SMTP_USERNAME=admin@gmail.com
+SMTP_PASSWORD=password
+```
 
-# Invoice Settings
+---
+
+## 💵 Configuración de facturación
+
+```env
 DEFAULT_TAX_RATE=19.0
 CURRENCY_SYMBOL=€
 CURRENCY_CODE=EUR
 ```
 
-### Generating Encryption Key
+---
+
+## 🔑 Generar clave segura
+
 ```bash
-# Generate a secure 32-character key
 openssl rand -hex 16
 ```
 
 ---
 
-## 🏭 Production Deployment
+# 🏭 Producción
 
-### With Reverse Proxy (Recommended)
-Create a reverse proxy setup with nginx or Traefik:
+## 🌐 Reverse Proxy con Nginx
 
-**nginx example:**
 ```nginx
 server {
     listen 80;
-    server_name rentalcore.yourdomain.com;
-    
+    server_name rentalcore.midominio.com;
+
     location / {
         proxy_pass http://localhost:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-### SSL/HTTPS Setup
-Use Let's Encrypt with certbot:
+---
+
+## 🔒 Configurar SSL
+
 ```bash
-sudo certbot --nginx -d rentalcore.yourdomain.com
-```
-
-### Backup Volumes
-Your data is stored in Docker volumes. To backup:
-```bash
-# Create backup directory
-mkdir backups
-
-# Backup uploads
-docker run --rm -v rentalcore-deployment_rentalcore_uploads:/data -v $(pwd)/backups:/backup alpine tar czf /backup/uploads.tar.gz -C /data .
-
-# Backup logs  
-docker run --rm -v rentalcore-deployment_rentalcore_logs:/data -v $(pwd)/backups:/backup alpine tar czf /backup/logs.tar.gz -C /data .
+sudo certbot --nginx -d rentalcore.midominio.com
 ```
 
 ---
 
-## 🔍 Troubleshooting
+## 💾 Crear backups
 
-### Health Check
-Test if the application is running:
+```bash
+mkdir backups
+```
+
+---
+
+## 📦 Backup de uploads
+
+```bash
+docker run --rm \
+-v rentalcore_uploads:/data \
+-v $(pwd)/backups:/backup \
+alpine tar czf /backup/uploads.tar.gz -C /data .
+```
+
+---
+
+## 📋 Backup de logs
+
+```bash
+docker run --rm \
+-v rentalcore_logs:/data \
+-v $(pwd)/backups:/backup \
+alpine tar czf /backup/logs.tar.gz -C /data .
+```
+
+---
+
+# 📊 Monitoreo y troubleshooting
+
+## ❤️ Health Check
+
 ```bash
 curl http://localhost:8080/health
-# Should return: {"service":"RentalCore","status":"ok"}
 ```
 
-### Database Connection Issues
-```bash
-# Test database connectivity
-docker-compose -f docker-compose.prod.yml exec rentalcore nc -z $DB_HOST $DB_PORT
+Respuesta esperada:
+
+```json
+{"service":"RentalCore","status":"ok"}
 ```
 
-### View Application Logs
+---
+
+## 📋 Logs en tiempo real
+
 ```bash
-# Real-time logs
 docker-compose -f docker-compose.prod.yml logs -f rentalcore
+```
 
-# Last 100 lines
+---
+
+## 📌 Últimos 100 logs
+
+```bash
 docker-compose -f docker-compose.prod.yml logs --tail=100 rentalcore
 ```
 
-### Common Issues
+---
 
-**1. Database Connection Failed**
-- Check DB credentials in `.env`
-- Ensure database server is accessible from Docker container
-- Verify firewall settings
+## 🔄 Reiniciar aplicación
 
-**2. Permission Denied**
-- Check file permissions on volumes
-- Ensure Docker has permission to access volumes
-
-**3. Out of Memory**
-- Increase Docker memory limits
-- Monitor resource usage: `docker stats`
-
-### Restart Services
 ```bash
-# Restart application only
 docker-compose -f docker-compose.prod.yml restart rentalcore
-
-# Restart all services
-docker-compose -f docker-compose.prod.yml restart
-
-# Full stop and start
-docker-compose -f docker-compose.prod.yml down
-docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ---
 
-## 📁 File Structure for Deployment
+## 🔄 Reiniciar todos los servicios
 
-Your deployment directory should look like this:
-```
-rentalcore-deployment/
-├── docker-compose.prod.yml
-├── .env
-├── .env.template
-└── backups/  (optional)
-```
-
----
-
-## 🔄 Updates
-
-To update to a new version:
 ```bash
-# Pull the latest image
-docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml restart
+```
 
-# Restart with new image
+---
+
+## 🛑 Detener y volver a iniciar
+
+```bash
+docker-compose -f docker-compose.prod.yml down
+
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ---
 
-## 📞 Support
+# ⚠️ Problemas comunes
 
-- **Documentation**: Check this file for common issues
-- **Logs**: Always check application logs first
-- **Health Check**: Use `/health` endpoint to verify service status
-- **Database**: Verify database connectivity separately
+## ❌ Error de conexión MySQL
 
-**Remember**: Always backup your data before updates!
+- Verificar credenciales
+- Revisar firewall
+- Confirmar accesibilidad del host
+- Validar puerto 3306
+
+---
+
+## ❌ Permisos denegados
+
+- Revisar permisos Docker
+- Validar acceso a volúmenes
+- Verificar permisos Linux
+
+---
+
+## ❌ Memoria insuficiente
+
+- Incrementar memoria Docker
+- Revisar consumo con:
+
+```bash
+docker stats
+```
+
+---
+
+# 🔄 Actualizaciones
+
+## 📥 Descargar nueva versión
+
+```bash
+docker-compose -f docker-compose.prod.yml pull
+```
+
+---
+
+## 🚀 Reiniciar con nueva imagen
+
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+---
+
+# 📈 Buenas prácticas
+
+## ✅ Recomendaciones
+
+- 💾 Realizar backups frecuentes
+- 🔒 Utilizar HTTPS siempre
+- 📊 Monitorear logs constantemente
+- ⚡ Actualizar imágenes regularmente
+- 🔑 Proteger variables sensibles
+- 🌐 Usar dominios seguros
+
+---
+
+# 🧠 Objetivos del despliegue
+
+## 🎯 Aprendizaje y DevOps
+
+- Docker profesional
+- Infraestructura cloud
+- Contenedores escalables
+- Seguridad empresarial
+- Reverse Proxy
+- SSL/TLS
+- CI/CD básico
+
+---
+
+# 🤝 Contribuciones
+
+Las contribuciones son bienvenidas ❤️
+
+## Cómo contribuir
+
+1. Fork del proyecto
+
+```bash
+git checkout -b feature/docker-improvements
+```
+
+2. Commit
+
+```bash
+git commit -m "🐳 Mejoras Docker"
+```
+
+3. Push
+
+```bash
+git push origin feature/docker-improvements
+```
+
+4. Pull Request 🚀
+
+---
+
+# 👨‍💻 Desarrollador
+
+<div align="center">
+
+## Isai Reyes — Full Stack Developer
+
+Desarrollador apasionado por DevOps, Docker y arquitecturas empresariales modernas 🚀
+
+</div>
+
+---
+
+# 🌟 Apoya el proyecto
+
+⭐ Dale una estrella  
+🍴 Haz fork  
+📢 Comparte el proyecto
+
+---
+
+# 📜 Licencia
+
+Proyecto open source bajo licencia MIT orientado a despliegues empresariales y cloud infrastructure.
+
+---
+
+<div align="center">
+
+### 🐳 RentalCore Docker Deployment Guide — despliegue profesional y escalable 🚀
+
+</div>
