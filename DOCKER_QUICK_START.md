@@ -120,7 +120,7 @@ Ideal para administradores, desarrolladores y entornos empresariales modernos.
 # 📂 Estructura del despliegue
 
 ```bash
-rentalcore-app/
+PlataformaGestionRentaEquipos/
 │
 ├── docker-compose.prod.yml
 ├── .env
@@ -154,18 +154,10 @@ rentalcore-app/
 ## 1️⃣ Crear directorio
 
 ```bash
-mkdir rentalcore-app && cd rentalcore-app
+mkdir PlataformaGestionRentaEquipos && cd PlataformaGestionRentaEquipos
 ```
 
----
 
-## 2️⃣ Descargar archivos
-
-```bash
-curl -O https://raw.githubusercontent.com/nbt4/rentalcore/main/docker-compose.prod.yml
-
-curl -O https://raw.githubusercontent.com/nbt4/rentalcore/main/.env.template
-```
 
 ---
 
@@ -333,7 +325,7 @@ docker-compose -f docker-compose.prod.yml down
 ## 🚀 Instalación rápida en una línea
 
 ```bash
-mkdir rentalcore && cd rentalcore && curl -O https://raw.githubusercontent.com/nbt4/rentalcore/main/docker-compose.prod.yml && curl -O https://raw.githubusercontent.com/nbt4/rentalcore/main/.env.template && cp .env.template .env && echo "Edit .env file with your settings, then run: docker-compose -f docker-compose.prod.yml up -d"
+mkdir PlataformaGestionRentaEquipos && cd PlataformaGestionRentaEquipos && curl -O https://raw.githubusercontent.com/isairey/PlataformaGestionRentaEquipos/main/docker-compose.prod.yml && curl -O https://raw.githubusercontent.com/isairey/PlataformaGestionRentaEquipos/main/.env.template && cp .env.template .env && echo "Edit .env file with your settings, then run: docker-compose -f docker-compose.prod.yml up -d"
 ```
 
 ---
