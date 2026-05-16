@@ -1,773 +1,567 @@
-# 🎯 RentalCore - Professional Equipment Rental Management System
+<div align="center">
 
-A comprehensive, enterprise-grade equipment rental management system built with Go, featuring advanced analytics, device tracking, and customer management. Designed for exclusive Docker deployment with professional theming and modern web interface.
+<img width="220" src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" />
 
-## 📑 Table of Contents
+# 🎯 RentalCore
 
-- [✨ Key Features](#-key-features)
-- [🚀 Quick Start](#-quick-start-docker-deployment)
-- [🏗️ Project Architecture](#️-project-architecture)
-- [🔧 Configuration](#-configuration-management)
-- [📊 API Documentation](#-api-documentation)
-- [🔐 Security](#-security-features)
-- [🚀 Deployment](#-production-deployment)
-- [📈 Performance](#-performance--scaling)
-- [🛠️ Development](#️-development)
-- [📝 Documentation](#-documentation)
-- [📱 Responsive Design](#-responsive-design)
-- [📷 Demo Images](#-demo-images)
-- [🏷️ Version History](#️-version-history)
-- [📧 Support](#-support--contact)
+### Plataforma profesional de gestión y renta de equipos 🚀
 
-## ✨ Key Features
+<p align="center">
+  <b>RentalCore</b> es un sistema empresarial de administración de renta de equipos desarrollado en Go, diseñado para empresas profesionales que requieren analítica avanzada, control de inventario, gestión de clientes y despliegue moderno con Docker.
+</p>
 
-### 📊 **Advanced Analytics Dashboard**
-- **Real-time Analytics**: Revenue trends, equipment utilization, customer metrics
-- **Interactive Charts**: Chart.js integration with responsive visualizations  
-- **Device Analytics**: Individual device performance with detailed insights modal
-- **Time Period Filtering**: 7 days, 30 days, 90 days, 1 year analysis
-- **Export Functionality**: PDF and CSV export with UTF-8 encoding
-- **Performance Metrics**: Utilization rates, booking statistics, revenue analysis
+<p align="center">
+  <img src="https://img.shields.io/badge/Go-EnterpriseBackend-00ADD8?style=for-the-badge&logo=go&logoColor=white">
+  <img src="https://img.shields.io/badge/Docker-Deployment-2496ED?style=for-the-badge&logo=docker&logoColor=white">
+  <img src="https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/Bootstrap-Frontend-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white">
+  <img src="https://img.shields.io/badge/OpenSource-ProductionReady-success?style=for-the-badge">
+</p>
 
-### 🏢 **Equipment Management**
-- **Device Inventory**: Complete equipment tracking with categories and products
-- **Availability Tracking**: Real-time device status (available, checked out, maintenance)
-- **QR Code & Barcode Generation**: Automated code generation for device identification
-- **🆕 Scan-Board**: Full-screen pack workflow board displaying large barcodes for all job devices
-  - **Live Pack Status**: Real-time visual indication of packed vs pending items
-  - **Visual Progress Tracking**: Circular progress indicator with completion percentage
-  - **Large Barcode Display**: High-contrast barcodes for easy scanning from distance
-  - **Missing Items Warning**: Smart workflow prevents finishing with missing items
-  - **Auto-refresh**: Live updates every 5 seconds with manual refresh option
-  - **Dark/Light Theme**: Supports both themes with optimal contrast for scanning
-- **🆕 Go-First Barcode Scanner**: Industrial-grade WASM-powered barcode scanner
-  - **Go WebAssembly Core**: High-performance decoder compiled from Go using gozxing
-  - **Industrial Symbology Support**: CODE128, CODE39, EAN-13/8, UPC-A/E, ITF, QR codes
-  - **Native Camera Experience**: Tap-to-focus, continuous autofocus, pinch/double-tap zoom, torch control
-  - **Progressive Enhancement**: Optimal performance on modern devices with graceful fallbacks
-  - **ROI Processing**: Center-focused 1D scanning with dynamic frame downscaling
-  - **Real-time Dedupe**: LRU cache with 1-2s cooldown prevents duplicate scans
-  - **Web Worker Architecture**: WASM decoder runs in background thread for smooth UI
-  - **Server-side Fallback**: Optional Go-powered server decode for ultimate compatibility
-  - **Responsive Design**: Full-screen scanner with professional overlay and controls
-  - **Performance Optimized**: 20-30 fps processing with sub-70ms decode times
-- **Bulk Operations**: Mass device assignment and status updates
-- **Equipment Packages**: Predefined equipment bundles for common rentals
-- **Revenue Tracking**: Per-device revenue analytics and performance insights
-- **🆕 Rental Equipment System**: External equipment rental tracking with supplier management
-- **🆕 Manual Entry & Selection**: Add external rentals directly to jobs or select from catalog
-- **🆕 Rental Analytics**: Dedicated analytics for external equipment usage and costs
+<p align="center">
+  <a href="#-acerca-del-proyecto">Acerca</a> •
+  <a href="#-características">Características</a> •
+  <a href="#-tecnologías-utilizadas">Tecnologías</a> •
+  <a href="#-instalación">Instalación</a> •
+  <a href="#-vista-previa">Vista previa</a>
+</p>
 
-### 👥 **Customer & Job Management**
-- **Customer Database**: Comprehensive customer information with rental history
-- **Job Lifecycle**: Complete job management from creation to completion
-- **Enhanced Job Modals**: Revenue and device count display with detailed overview
-- **Device Assignment**: Bulk scanning and assignment to rental jobs
-- **Device Price Management**: Real-time price adjustment per job with API integration
-- **Categorized Device Overview**: Devices grouped by Sound, Light, Effect, Stage, Other
-- **Invoice Generation**: Professional invoice creation with customizable templates
-- **Status Tracking**: Real-time job status updates with audit trails
+</div>
 
-### 💼 **Professional Features**
-- **RentalCore Design System**: Professional dark theme with consistent branding
-- **🆕 Fully Responsive Design**: Complete mobile-first responsive implementation
-  - **Mobile Navigation**: Drawer-style navigation with backdrop and touch optimization
-  - **Tablet Interface**: Icon rail navigation with compact layouts
-  - **Desktop Experience**: Full sidebar with comprehensive layouts
-  - **Responsive Tables**: Card transformation for mobile, horizontal scroll with sticky columns
-  - **Adaptive Forms**: Single-column mobile, multi-column desktop with responsive grids
-  - **Touch-Optimized**: 44px minimum touch targets, enhanced focus states
-- **PWA Support**: Progressive Web App features for mobile deployment
-- **Multi-language Support**: Internationalization ready
-- **Document Management**: File upload, signature collection, document archival
+---
 
-### 🔐 **Security & Administration**  
-- **User Management**: Role-based access control with security audit logs
-- **2FA Authentication**: Two-factor authentication with WebAuthn support
-- **Encryption**: Industry-standard data encryption and secure key management
-- **GDPR Compliance**: Privacy controls and data retention management
-- **Security Monitoring**: Real-time security event tracking and alerting
+# 🌌 Acerca del proyecto
 
-### 📈 **Business Intelligence**
-- **Financial Dashboard**: Revenue tracking, payment monitoring, tax reporting
-- **Performance Monitoring**: System metrics, error tracking, health checks
-- **Audit Logging**: Comprehensive activity logging for compliance
-- **Backup Management**: Automated data backup with retention policies
+**RentalCore** es una plataforma empresarial de renta y administración de equipos desarrollada para automatizar procesos de alquiler, monitoreo, inventario y análisis financiero desde una interfaz moderna y profesional.
 
-## 🚀 Quick Start (Docker Deployment)
+El sistema fue diseñado para empresas que requieren:
 
-### Prerequisites
-- Docker Engine 20.10+
-- Docker Compose 2.0+
-- External MySQL/MariaDB database
-- Domain with SSL certificate (production)
+- 🎯 Gestión avanzada de equipos
+- 📦 Control de inventario
+- 👥 Administración de clientes
+- 📊 Analítica empresarial
+- 📱 Compatibilidad móvil
+- 🔐 Seguridad avanzada
+- 🧾 Facturación profesional
+- 🚀 Infraestructura escalable
 
-### 1. Get Configuration Files
+Además, la plataforma incorpora tecnologías modernas como WebAssembly, escaneo industrial de códigos de barras y despliegue completo mediante Docker.
+
+---
+
+# ✨ Características
+
+## 📊 Dashboard y analítica avanzada
+
+- 📈 Estadísticas en tiempo real
+- 💰 Análisis financiero
+- 📉 Métricas de rendimiento
+- 📊 Gráficas interactivas
+- 📅 Filtros por periodos
+- 📄 Exportación PDF y CSV
+- 📌 Seguimiento de ingresos
+
+---
+
+## 🏢 Gestión de equipos
+
+- 📦 Inventario completo
+- 🏷️ Categorías y productos
+- 🔍 Seguimiento de disponibilidad
+- 📸 Gestión de dispositivos
+- 🧾 Historial de uso
+- 📊 Control de mantenimiento
+- ⚡ Operaciones masivas
+
+---
+
+## 🔍 Escáner industrial WASM
+
+- 📱 Escaneo de códigos QR
+- 📦 Compatibilidad CODE128 y EAN
+- ⚡ Procesamiento en tiempo real
+- 🚀 Motor Go WebAssembly
+- 📷 Integración con cámara nativa
+- 🔄 Escaneo continuo
+- 🔦 Control de enfoque y zoom
+
+---
+
+## 👥 Gestión de clientes y trabajos
+
+- 👤 Base de datos de clientes
+- 📋 Historial de alquileres
+- 🧾 Gestión de contratos
+- 💵 Facturación automática
+- 📦 Asignación de equipos
+- 📊 Seguimiento de trabajos
+- 📈 Reportes administrativos
+
+---
+
+## 🔐 Seguridad empresarial
+
+- 🔑 Autenticación 2FA
+- 🛡️ Roles y permisos
+- 🔒 Encriptación AES-256
+- 📋 Auditoría completa
+- 🌐 Protección HTTPS
+- ⚠️ Monitoreo de eventos
+- 🧠 Gestión segura de sesiones
+
+---
+
+## 📱 Diseño responsive profesional
+
+- 📲 Mobile First
+- 🖥️ Panel adaptativo
+- 📋 Tablas responsivas
+- 🎨 Tema oscuro moderno
+- ⚡ Navegación optimizada
+- 👆 Compatibilidad táctil
+- 🌍 Progressive Web App
+
+---
+
+# 🛠️ Tecnologías utilizadas
+
+## 🎨 Frontend
+
+<p>
+  <img src="https://skillicons.dev/icons?i=html,css,bootstrap,js" />
+</p>
+
+- HTML5
+- CSS3
+- Bootstrap 5
+- JavaScript
+- Chart.js
+- PWA Support
+
+---
+
+## ⚙️ Backend
+
+<p>
+  <img src="https://skillicons.dev/icons?i=go" />
+</p>
+
+- Go 1.23+
+- Gin Framework
+- GORM ORM
+- REST API
+- WebAssembly
+- Middleware personalizado
+
+---
+
+## 🗄️ Base de datos
+
+<p>
+  <img src="https://skillicons.dev/icons?i=mysql" />
+</p>
+
+- MySQL 8+
+- Relaciones ORM
+- Migraciones automáticas
+- Persistencia escalable
+
+---
+
+## 🧰 Herramientas y DevOps
+
+<p>
+  <img src="https://skillicons.dev/icons?i=docker,git,github,vscode" />
+</p>
+
+- Docker
+- Docker Compose
+- Git
+- GitHub
+- Visual Studio Code
+- Prometheus
+
+---
+
+# 📂 Estructura del proyecto
+
 ```bash
-git clone https://github.com/nbt4/RentalCore.git
-cd RentalCore
-
-# Or download configuration files directly
-wget https://github.com/nbt4/RentalCore/raw/main/docker-compose.example.yml
-wget https://github.com/nbt4/RentalCore/raw/main/.env.example
-wget https://github.com/nbt4/RentalCore/raw/main/config.json.example
-```
-
-### 2. Configure Environment
-```bash
-# Copy and configure environment variables
-cp .env.example .env
-nano .env  # Edit with your database credentials
-
-# Copy and configure application settings  
-cp config.json.example config.json
-nano config.json  # Customize application settings
-
-# Copy and configure Docker Compose
-cp docker-compose.example.yml docker-compose.yml
-nano docker-compose.yml  # Adjust for your environment
-```
-
-### 3. Deploy
-```bash
-# Start the application
-docker-compose up -d
-
-# Check status
-docker-compose ps
-docker-compose logs -f rentalcore
-
-# Access the application
-open http://localhost:8080
-```
-
-## 🏗️ Project Architecture
-
-### 📁 **Directory Structure**
-```
-rentalcore/
-├── cmd/server/              # Application entry point
+RentalCore/
+│
+├── cmd/server/               # Punto de entrada
 ├── internal/
-│   ├── handlers/           # HTTP request handlers
-│   ├── models/             # Database models and structures
-│   ├── services/           # Business logic services
-│   └── middleware/         # HTTP middleware
+│   ├── handlers/             # Controladores HTTP
+│   ├── middleware/           # Middlewares
+│   ├── models/               # Modelos ORM
+│   └── services/             # Lógica de negocio
+│
 ├── web/
-│   ├── templates/          # HTML templates with modern design
-│   └── static/            # CSS, JavaScript, assets
-├── migrations/             # Database migration scripts
-├── keys/                   # SSL certificates and keys
-├── logs/                   # Application logs
-├── uploads/               # User uploaded files
-├── docker-compose.yml      # Docker deployment configuration
-├── .env                   # Environment variables (not in repo)
-├── config.json            # Application configuration (not in repo)
-├── .gitignore             # Git ignore rules with credential protection
-└── README.md              # This documentation
+│   ├── templates/            # Interfaces HTML
+│   └── static/               # CSS, JS y assets
+│
+├── migrations/               # Migraciones SQL
+├── uploads/                  # Archivos subidos
+├── logs/                     # Logs del sistema
+├── docker-compose.yml
+├── config.json
+├── .env
+└── README.md
 ```
 
-### 🛠️ **Technology Stack**
-- **Backend**: Go 1.23+ with Gin web framework
-- **Database**: MySQL 8.0+ with GORM ORM
-- **Frontend**: HTML5, Bootstrap 5, Chart.js, vanilla JavaScript
-- **Authentication**: WebAuthn, 2FA, session management
-- **Deployment**: Docker with health checks and volume management
-- **Monitoring**: Prometheus metrics, structured logging
-- **Security**: TLS encryption, CORS protection, input validation
+---
 
-## 🔧 Configuration Management
+# ⚡ Instalación
 
-### **Environment Variables (.env)**
+## 📋 Requisitos
+
+- Docker Engine 20+
+- Docker Compose
+- MySQL / MariaDB
+- Go 1.23+
+- Linux o Windows
+- Certificados SSL (Producción)
+
+---
+
+# 🚀 Configuración del proyecto
+
+## 1️⃣ Clonar repositorio
+
 ```bash
-# Database Configuration
-DB_HOST=your-database-host.com
+git clone https://github.com/isairey/RentalCore.git
+```
+
+---
+
+## 2️⃣ Entrar al proyecto
+
+```bash
+cd RentalCore
+```
+
+---
+
+## 3️⃣ Configurar variables de entorno
+
+```bash
+cp .env.example .env
+```
+
+Editar:
+
+```env
+DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=rentalcore
-DB_USERNAME=rentalcore_user
-DB_PASSWORD=secure_password
-
-# Security Settings
-ENCRYPTION_KEY=your-256-bit-encryption-key
-SESSION_TIMEOUT=3600
-GIN_MODE=release
-
-# Optional: Email Configuration
-SMTP_HOST=smtp.yourdomain.com
-SMTP_PORT=587
-SMTP_USERNAME=noreply@yourdomain.com
-SMTP_PASSWORD=email_password
+DB_USERNAME=root
+DB_PASSWORD=password
 ```
-
-### **Application Configuration (config.json)**
-- **UI Theming**: Professional dark theme with customizable colors
-- **Feature Flags**: Enable/disable specific functionality
-- **Performance Settings**: Cache timeouts, connection pooling
-- **Invoice Configuration**: Tax rates, payment terms, currency settings
-- **Security Policies**: Password requirements, session management
-
-## 📊 API Documentation
-
-### **Analytics Endpoints**
-- `GET /analytics` - Main analytics dashboard
-- `GET /analytics/devices/:deviceId` - Individual device analytics
-- `GET /analytics/devices/all` - All device revenue data
-- `GET /analytics/export` - Export analytics data (PDF/CSV)
-
-### **Core Management APIs**
-- `GET|POST|PUT|DELETE /api/v1/jobs` - Job management
-- `GET|POST|PUT|DELETE /api/v1/devices` - Device inventory
-- `GET|POST|PUT|DELETE /api/v1/customers` - Customer database
-- `GET|POST|PUT|DELETE /api/v1/invoices` - Invoice management
-
-### **Utility Endpoints**
-- `GET /health` - Application health check
-- `GET /barcodes/device/:id/qr` - Generate QR codes
-- `POST /search/global` - Global search functionality
-- `GET /monitoring/metrics` - Prometheus metrics
-
-## 🔐 Security Features
-
-### **Authentication & Authorization**
-- Multi-factor authentication (2FA, WebAuthn)
-- Role-based access control (RBAC)
-- Session management with secure cookies
-- Password policy enforcement
-
-### **Data Protection**
-- Industry-standard encryption (AES-256)
-- HTTPS/TLS termination
-- Input validation and sanitization
-- SQL injection prevention
-- CSRF protection
-
-### **Compliance & Auditing**
-- GDPR compliance features
-- Comprehensive audit logging
-- Data retention policies
-- Security event monitoring
-
-## 🚀 Production Deployment
-
-### **Docker Hub Images**
-```bash
-# Latest stable release
-docker pull nbt4/rentalcore:latest
-
-# Specific version
-docker pull nbt4/rentalcore:1.4
-```
-
-### **Reverse Proxy Integration**
-```yaml
-# Traefik labels example
-labels:
-  - "traefik.enable=true"
-  - "traefik.http.routers.rentalcore.rule=Host(`rental.yourdomain.com`)"
-  - "traefik.http.services.rentalcore.loadbalancer.server.port=8080"
-  - "traefik.http.routers.rentalcore.tls.certresolver=letsencrypt"
-```
-
-### **Monitoring & Maintenance**
-```bash
-# Health check
-curl https://rental.yourdomain.com/health
-
-# View logs
-docker-compose logs -f --tail=100 rentalcore
-
-# Update deployment
-docker-compose pull && docker-compose up -d
-
-# Backup data
-docker run --rm -v rentalcore_uploads:/data -v $(pwd):/backup alpine tar czf /backup/backup.tar.gz /data
-```
-
-## 📈 Performance & Scaling
-
-### **Optimization Features**
-- Database connection pooling (50 connections default)
-- Response caching for analytics data
-- Lazy loading for large datasets
-- Image optimization and compression
-- Minified CSS/JavaScript assets
-
-### **Monitoring Metrics**
-- Application performance monitoring (APM)
-- Database query performance
-- Memory and CPU utilization
-- Error rate and response time tracking
-- User activity analytics
-
-## 🛠️ Development
-
-### **Local Development Setup**
-```bash
-# Clone repository
-git clone https://github.com/nbt4/RentalCore.git
-cd RentalCore
-
-# Copy configuration examples
-cp .env.example .env
-cp config.json.example config.json
-
-# Build and run
-go mod tidy
-go build -o server ./cmd/server
-./server
-
-# Or use Docker for development
-docker-compose up -d --build
-```
-
-### **Contributing**
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 Documentation
-
-All documentation is organized in the `docs/` folder for easy access:
-
-### Core Documentation
-- **[Database Setup Guide](docs/DATABASE_SETUP.md)** - Complete database installation and configuration guide
-
-### Deployment Guides
-- **[Docker Deployment](docs/DOCKER_DEPLOYMENT.md)** - Comprehensive deployment instructions
-- **[Quick Start Guide](docs/DOCKER_QUICK_START.md)** - Rapid deployment guide
-- **[Configuration Examples](docs/CONFIGURATION.md)** - Environment and config examples
-
-### Technical Documentation
-- **[API Reference](docs/API.md)** - Complete API documentation
-- **[Security Guide](docs/SECURITY.md)** - Security best practices and features
-- **[Architecture Guide](docs/ARCHITECTURE.md)** - System architecture and design patterns
-
-### User Guides
-- **[User Manual](docs/USER_GUIDE.md)** - Complete user documentation
-- **[Admin Guide](docs/ADMIN_GUIDE.md)** - Administrator documentation
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
-
-## 🏷️ Version History
-
-### **v2.9** (Latest) - Complete Responsive Design System
-- ✅ **Mobile-First Responsive Design**: Complete overhaul with mobile-first approach
-- ✅ **Adaptive Navigation**: Mobile drawer, tablet rail, desktop sidebar navigation
-- ✅ **Responsive Tables**: Card transformation and horizontal scroll options for mobile
-- ✅ **Fluid Typography**: CSS clamp() implementation for scalable text (14px-48px)
-- ✅ **Touch Optimization**: 44px minimum touch targets, enhanced focus states
-- ✅ **Responsive Forms**: Single-column mobile, multi-column desktop layouts
-- ✅ **Modal Enhancements**: Full-screen mobile modals, adaptive tablet/desktop sizing
-- ✅ **Accessibility Improvements**: WCAG 2.2 AA compliance, reduced motion support
-- ✅ **Layout Primitives**: Stack, Inline, Cluster, Sidebar responsive patterns
-- ✅ **Responsive Utilities**: Breakpoint visibility controls, responsive images
-
-### **v2.4** - Rental Equipment System
-- ✅ Complete rental equipment management system for external equipment
-- ✅ Rental equipment database tables with job integration
-- ✅ Dedicated rental equipment management page with CRUD operations
-- ✅ Rental equipment analytics dashboard with charts and statistics
-- ✅ Job integration with manual entry and existing equipment selection
-- ✅ Products navbar dropdown for Own Products vs Rental Equipment
-- ✅ Supplier management and category-based organization
-- ✅ Real-time cost calculation and usage tracking
-
-### **v1.4**
-- ✅ Enhanced job view modal with comprehensive device management
-- ✅ Revenue and device count display in job modals
-- ✅ Clickable device count for detailed device overview
-- ✅ Device overview grouped by 5 categories (Sound, Light, Effect, Stage, Other)
-- ✅ Real-time device price adjustment per job with API integration
-- ✅ Toast notifications for user feedback on price changes
-- ✅ Improved customer display and status handling in job modals
-
-### **v1.3.0**
-- ✅ Complete device analytics modal with detailed insights
-- ✅ Enhanced Docker deployment with configuration examples
-- ✅ Comprehensive .gitignore with credential protection
-- ✅ UTF-8 PDF export fixes for proper currency formatting
-
-### **v1.1.0**
-- ✅ Analytics dashboard complete rewrite
-- ✅ Fixed dropdown functionality and data display issues
-- ✅ Professional RentalCore theming implementation
-
-## 📧 Support & Contact
-
-- **Issues**: [GitHub Issues](https://github.com/nbt4/RentalCore/issues)
-- **Docker Hub**: [nbt4/rentalcore](https://hub.docker.com/r/nbt4/rentalcore)
-- **Documentation**: [GitHub Repository](https://github.com/nbt4/RentalCore)
-
-## 📱 Responsive Design
-
-RentalCore features a comprehensive responsive design system built from the ground up for optimal user experience across all devices.
-
-### 🎯 **Design Philosophy**
-- **Mobile-First Approach**: Designed primarily for mobile devices, progressively enhanced for larger screens
-- **Touch-Optimized**: All interactive elements meet WCAG 2.2 AA guidelines with 44×44px minimum touch targets
-- **Accessibility-Focused**: Enhanced focus states, reduced motion support, and screen reader optimization
-- **Performance-Oriented**: Fluid typography and spacing using CSS clamp() functions
-
-## 🎨 Design System & Responsive Guidelines
-
-### **Design Tokens**
-
-#### Spacing Scale (Consistent 4,8,12,16,20,24,32,40,48)
-```css
---space-1: 0.25rem;   /* 4px */
---space-2: 0.5rem;    /* 8px */
---space-3: 0.75rem;   /* 12px */
---space-4: 1rem;      /* 16px */
---space-5: 1.25rem;   /* 20px */
---space-6: 1.5rem;    /* 24px */
---space-8: 2rem;      /* 32px */
---space-10: 2.5rem;   /* 40px */
---space-12: 3rem;     /* 48px */
-```
-
-#### Typography Scale (Fluid with clamp)
-```css
---text-xs: clamp(0.75rem, 0.9vw, 0.875rem);    /* 12-14px - Label/Meta */
---text-sm: clamp(0.875rem, 1.0vw, 1rem);       /* 14-16px - Body */
---text-base: clamp(1rem, 1.0vw, 1rem);         /* 16px - Body baseline */
---text-xl: clamp(1.125rem, 1.4vw, 1.375rem);   /* 18-22px - H3 */
---text-2xl: clamp(1.375rem, 1.8vw, 1.75rem);   /* 22-28px - H2 */
---text-3xl: clamp(1.75rem, 2.4vw, 2.25rem);    /* 28-36px - H1 */
-```
-
-#### Border Radius
-```css
---radius-sm: 0.375rem;   /* 6px */
---radius-md: 0.625rem;   /* 10px */
---radius-lg: 1rem;       /* 16px */
-```
-
-#### Container Max-Widths
-```css
---container-sm: 40rem;     /* 640px */
---container-md: 48rem;     /* 768px */
---container-lg: 64rem;     /* 1024px */
---container-xl: 80rem;     /* 1280px */
---container-2xl: 90rem;    /* 1440px max content width */
-```
-
-### **Grid System**
-
-#### Auto-Fill Grids (Prevents Tiny Cards)
-```css
-.rc-grid-auto {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-6); /* 24px on mobile */
-    gap: var(--space-8); /* 32px on desktop */
-}
-```
-
-#### Card Grids with Minmax Rules
-- **Mobile**: Single column, full width
-- **Tablet/Desktop**: `repeat(auto-fill, minmax(280px, 1fr))`
-- **Large Desktop**: `repeat(auto-fill, minmax(320px, 1fr))`
-
-### **Layout Patterns**
-
-#### App Shell Centering
-```css
-.rc-container {
-    max-width: var(--container-xl); /* 1280px */
-    margin: 0 auto;
-    padding: 0 var(--space-4); /* 16px base */
-    padding: 0 var(--space-6); /* 24px on tablet+ */
-    padding: 0 var(--space-8); /* 32px on large desktop */
-}
-```
-
-#### Form Grids
-- **Mobile**: Single column layout
-- **Tablet (768px+)**: Two-column grid for appropriate fields
-- **Desktop (1024px+)**: Three-column grid for complex forms
-- **Gap**: Consistent `var(--space-5)` (20px)
-
-#### Data Tables
-- **Desktop**: Generous padding (16px vertical, 24px horizontal)
-- **Tablet**: Reduced padding (12px vertical, 16px horizontal)
-- **Mobile**: Card transformation OR horizontal scroll with sticky first column
-- **Touch Targets**: 44-56px row heights
-
-### **Accessibility Features**
-
-#### Touch Targets
-- **Minimum**: 44×44px for all interactive elements
-- **Buttons**: Consistent `min-height: 44px`
-- **Form Inputs**: `min-height: 44px` with proper padding
-
-#### Focus States
-- **Focus-visible**: 2px solid accent outline with 2px offset
-- **Focus Rings**: Only visible for keyboard navigation
-- **High Contrast**: Maintains WCAG 2.2 AA compliance
-
-#### Responsive Images
-```css
-.responsive-image {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16/9; /* Intrinsic sizing */
-    object-fit: cover;
-}
-```
-
-### **Performance Optimizations**
-
-#### CSS Features
-- **Fluid Typography**: Uses `clamp()` for optimal scaling
-- **Container Queries**: Future-ready responsive patterns
-- **CSS Grid**: Prefer over flexbox for 2D layouts
-- **Aspect Ratio**: Prevents cumulative layout shift
-
-#### Best Practices
-- Content-driven heights (avoid forced equal heights)
-- Lazy loading for non-critical media
-- Efficient selector specificity
-- Minimal layout thrash with CSS-only solutions
-
-### 📱 **Breakpoint Strategy**
-- **xs (360-479px)**: Compact phones with stacked layouts
-- **sm (480-639px)**: Large phones with selective horizontal arrangements
-- **md (640-767px)**: Small tablets and landscape phones
-- **lg (768-1023px)**: Tablets with icon rail navigation
-- **xl (1024-1279px)**: Small laptops with full features
-- **2xl (1280px+)**: Desktop monitors with expanded layouts
-
-### 🧩 **Component Responsiveness**
-
-#### Navigation System
-- **Mobile**: Full-screen drawer navigation with backdrop blur
-- **Tablet**: Compact icon rail with tooltips for space efficiency
-- **Desktop**: Full sidebar navigation with labels and dropdowns
-
-#### Data Tables
-- **Mobile**: Transform to card-based layout for better readability
-- **Alternative**: Horizontal scroll with sticky first column and header
-- **Tablet**: Compact spacing with column prioritization
-- **Desktop**: Full table layout with enhanced hover states
-
-#### Forms & Modals
-- **Mobile**: Single-column layouts, full-screen modals for complex dialogs
-- **Tablet**: Two-column grids where appropriate, adaptive modal sizing
-- **Desktop**: Multi-column layouts with optimized field grouping
-
-#### Layout Primitives
-- **Stack**: Vertical layouts with responsive spacing
-- **Inline**: Horizontal wrapping with intelligent overflow
-- **Cluster**: Flexible button groups that stack on mobile
-- **Sidebar**: Responsive content/sidebar combinations
-
-### 🎨 **Fluid Design System**
-- **Typography**: Scales from 14px to 48px using clamp() functions
-- **Spacing**: Responsive spacing scale from 4px to 96px
-- **Components**: Auto-adapting cards, forms, and data displays
-- **Images**: Aspect ratio preservation with responsive sizing
-
-## 📷 Demo Images
-
-Get a visual overview of RentalCore's professional interface and features:
-
-### Login & Authentication
-<img src="img/login-page.png" alt="RentalCore Login Page" width="600">
-
-Professional login interface with secure authentication and modern design.
-
-### Main Dashboard
-<img src="img/dashboard-overview.png" alt="RentalCore Dashboard Overview" width="600">
-
-Comprehensive dashboard showing active customers, equipment items, jobs, and quick action buttons for daily operations.
-
-### Equipment Management
-<img src="img/devices-management.png" alt="Devices Management" width="600">
-
-Complete device inventory management with search, status tracking, and bulk operations.
-
-<img src="img/products-management.png" alt="Products Management" width="600">
-
-Product catalog management with categories, pricing, and detailed descriptions.
-
-<img src="img/device-tree-view.png" alt="Device Tree View" width="600">
-
-Hierarchical device organization by categories and types for easy navigation and management.
-
-### Cable & Case Management
-<img src="img/cables-management.png" alt="Cables Management" width="600">
-
-Specialized cable management with connector types, lengths, and cross-section specifications.
-
-<img src="img/cases-management.png" alt="Cases Management" width="600">
-
-Equipment case tracking with device capacity and availability status.
-
-<img src="img/case-devices-modal.png" alt="Case Devices Modal" width="600">
-
-Detailed view of devices within equipment cases for precise inventory control.
-
-### Job Management & Scanning
-<img src="img/job-selection-scanning.png" alt="Job Selection for Scanning" width="600">
-
-Job selection interface with overview of active jobs, available devices, and assignments.
-
-<img src="img/job-scanning-interface.png" alt="Job Scanning Interface" width="600">
-
-Advanced scanning interface with barcode/QR code scanning, manual input, and device selection.
-
-<img src="img/job-overview-barcode-scanner.png" alt="Job Overview with Barcode Scanner" width="600">
-
-Complete job overview with integrated barcode scanner and quick device scanning for case assignments.
 
 ---
 
-## 📱 Go-First Barcode Scanner Architecture
+## 4️⃣ Configurar Docker
 
-### **Core Technology Stack**
-
-#### **Go WebAssembly Decoder (`web/scanner/decoder/`)**
-```
-decoder.go      - Main WASM export functions and gozxing integration
-types.go        - Type definitions and configuration structures
-roi.go          - Region of interest processing and image manipulation
-dedupe.go       - LRU cache with time-based duplicate prevention
-```
-
-**Build Pipeline:**
 ```bash
-# Development build
-cd web/scanner/wasm && ./build.sh
-
-# Production build (optimized)
-cd web/scanner/wasm && ./build.sh prod
-
-# Verify build
-make verify
+cp docker-compose.example.yml docker-compose.yml
 ```
-
-#### **JavaScript Worker Bridge (`web/scanner/worker/`)**
-```
-decoder.worker.js    - Web Worker bootstrap for WASM loading
-decoder-manager.js   - Main thread API for worker communication
-```
-
-#### **Camera & UI Controls (`web/scanner/ui/`)**
-```
-camera.js           - getUserMedia with advanced camera controls
-capabilities.js     - Device/browser capability detection
-gestures.js         - Touch gestures (pinch zoom, tap-to-focus)
-scanner-integration.js - Integration with existing scan endpoints
-ScannerView.tsx     - React component (full scanner interface)
-scanner.css         - Professional scanner styling
-```
-
-### **Supported Barcode Formats**
-
-| **1D Barcodes** | **2D Codes** | **Status** |
-|-----------------|--------------|------------|
-| CODE_128        | QR_CODE      | ✅ Active  |
-| CODE_39         | -            | ✅ Active  |
-| EAN_13/8        | -            | ✅ Active  |
-| UPC_A/E         | -            | ✅ Active  |
-| ITF             | -            | ✅ Active  |
-
-*Note: DataMatrix and PDF417 planned for future gozxing releases*
-
-### **Performance Characteristics**
-
-| **Metric**           | **Target**    | **Typical** |
-|---------------------|---------------|-------------|
-| Decode Latency      | <100ms        | ~50-70ms    |
-| Frame Rate          | 20-30 fps     | 25 fps      |
-| WASM Load Time      | <5s           | ~2-3s       |
-| Memory Usage        | <50MB         | ~30MB       |
-| Battery Impact      | Minimal       | Optimized   |
-
-### **Browser Support Matrix**
-
-| **Browser**     | **WASM** | **Camera** | **Worker** | **Touch** | **Status** |
-|-----------------|----------|------------|------------|-----------|------------|
-| Chrome 90+      | ✅       | ✅         | ✅         | ✅        | Full       |
-| Safari 14+      | ✅       | ✅         | ✅         | ✅        | Full       |
-| Firefox 89+     | ✅       | ✅         | ✅         | ✅        | Full       |
-| Edge 90+        | ✅       | ✅         | ✅         | ✅        | Full       |
-| Chrome Android  | ✅       | ✅         | ✅         | ✅        | Full       |
-| Safari iOS      | ✅       | ✅         | ✅         | ✅        | Full       |
-
-### **Development & Testing**
-
-#### **Demo Route** (Development Only)
-```
-http://localhost:8080/dev/scanner-demo
-```
-- Live WASM decoder testing with camera feed
-- Real-time performance metrics and statistics
-- Fallback server decode testing
-- Browser capability detection results
-
-#### **Server-side Fallback** (Optional)
-```bash
-# Enable server-side decode (disabled by default)
-export ENABLE_SERVER_DECODE=true
-
-# Test fallback endpoint
-curl -X POST http://localhost:8080/api/scan/decode \
-  -H "Content-Type: application/json" \
-  -d '{"imageData": "base64...", "width": 640, "height": 480}'
-```
-
-#### **Build & Deployment**
-```bash
-# Build WASM decoder
-cd web/scanner/wasm
-./build.sh prod
-
-# Copy assets to static directory
-cp decoder.wasm ../../../web/static/scanner/wasm/
-cp wasm_exec.js ../../../web/static/scanner/wasm/
-cp ../ui/*.js ../../../web/static/scanner/ui/
-
-# Docker build includes WASM assets
-docker build -t nbt4/rentalcore:latest .
-```
-
-### **Integration with RentalCore**
-
-The Go-first scanner integrates seamlessly with existing RentalCore scan endpoints:
-
-```javascript
-// Scanner automatically calls existing endpoints
-POST /scan/{jobId}/assign          // Device assignment
-POST /scan/{jobId}/assign-case     // Case assignment
-POST /api/v1/jobs/{jobId}/assign-rental  // Rental equipment
-
-// Events emitted for UI updates
-scanner.addEventListener('deviceAssigned', (event) => {
-  // Update UI, show success feedback
-  // Integrates with existing job management
-});
-```
-
-**Progressive Enhancement Philosophy:**
-- **Path A**: Go-WASM decoder worker (optimal performance)
-- **Path B**: Browser BarcodeDetector (if faster for specific formats)
-- **Path C**: Server-side Go decode (ultimate compatibility)
 
 ---
 
-## 📄 License
+## 5️⃣ Ejecutar contenedores
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-The MIT License allows you to:
-- ✅ Use the software for any purpose (commercial or non-commercial)
-- ✅ Modify and distribute the software
-- ✅ Create derivative works
-- ✅ Use in private projects
-- ✅ Sell copies or services based on the software
-
-**No warranty is provided - use at your own risk.**
+```bash
+docker-compose up -d
+```
 
 ---
 
-**🎯 Ready for Production**: RentalCore is designed for professional equipment rental businesses requiring comprehensive analytics, robust security, and scalable Docker deployment.
+## 6️⃣ Verificar estado
+
+```bash
+docker-compose ps
+```
+
+---
+
+## 7️⃣ Abrir aplicación
+
+```bash
+http://localhost:8080
+```
+
+---
+
+# 📊 Funcionalidades principales
+
+## 🎯 Gestión empresarial
+
+- Administración de trabajos
+- Gestión de clientes
+- Facturación
+- Reportes financieros
+- Inventario inteligente
+
+---
+
+## 📦 Gestión de inventario
+
+- Equipos y dispositivos
+- Códigos QR y barras
+- Escaneo industrial
+- Seguimiento en tiempo real
+- Control de disponibilidad
+
+---
+
+## 📈 Analítica avanzada
+
+- Métricas en vivo
+- Dashboard profesional
+- Exportación PDF/CSV
+- Estadísticas financieras
+- Visualización interactiva
+
+---
+
+## 🔐 Seguridad y monitoreo
+
+- Roles de usuario
+- 2FA y WebAuthn
+- Auditorías
+- Logs centralizados
+- Protección avanzada
+
+---
+
+# 📸 Vista previa
+
+<div align="center">
+
+### 🔐 Inicio de sesión
+<img src="img/login-page.png" width="900"/>
+
+### 📊 Dashboard principal
+<img src="img/dashboard-overview.png" width="900"/>
+
+### 📦 Gestión de dispositivos
+<img src="img/devices-management.png" width="900"/>
+
+### 📋 Gestión de productos
+<img src="img/products-management.png" width="900"/>
+
+### 📱 Escáner profesional
+<img src="img/job-scanning-interface.png" width="900"/>
+
+### 📦 Árbol de dispositivos
+<img src="img/device-tree-view.png" width="900"/>
+
+### 📂 Gestión de cases
+<img src="img/cases-management.png" width="900"/>
+
+### 📈 Vista de trabajos
+<img src="img/job-overview-barcode-scanner.png" width="900"/>
+
+</div>
+
+---
+
+# 🌐 API REST
+
+## 📡 Endpoints principales
+
+### 📊 Analytics API
+
+```bash
+GET /analytics
+GET /analytics/export
+GET /analytics/devices/:id
+```
+
+---
+
+### 📦 Equipos y dispositivos
+
+```bash
+GET /api/v1/devices
+POST /api/v1/devices
+PUT /api/v1/devices/:id
+DELETE /api/v1/devices/:id
+```
+
+---
+
+### 👥 Clientes
+
+```bash
+GET /api/v1/customers
+POST /api/v1/customers
+```
+
+---
+
+### 📋 Trabajos
+
+```bash
+GET /api/v1/jobs
+POST /api/v1/jobs
+```
+
+---
+
+# 🔍 Arquitectura del escáner WASM
+
+## ⚡ Go WebAssembly
+
+- Procesamiento industrial
+- Decodificación rápida
+- Web Workers
+- ROI inteligente
+- Escaneo continuo
+- Compatibilidad móvil
+
+---
+
+## 📦 Formatos soportados
+
+| Tipo | Compatibilidad |
+|------|----------------|
+| CODE128 | ✅ |
+| CODE39 | ✅ |
+| EAN-13 | ✅ |
+| EAN-8 | ✅ |
+| QR Code | ✅ |
+| UPC-A/E | ✅ |
+
+---
+
+# 📱 Diseño responsive
+
+## 🎨 Sistema adaptativo
+
+- 📲 Navegación móvil
+- 🖥️ Sidebar escritorio
+- 📋 Tablas inteligentes
+- 📏 Tipografía fluida
+- ⚡ Optimización táctil
+- 🌍 Compatibilidad total
+
+---
+
+# 🚀 Despliegue profesional
+
+## 🐳 Docker Deployment
+
+```bash
+docker pull rentalcore/latest
+```
+
+---
+
+## 🌐 Reverse Proxy
+
+Compatible con:
+
+- Nginx
+- Traefik
+- Apache
+- Cloudflare
+
+---
+
+## 📊 Monitoreo
+
+- Prometheus
+- Logs estructurados
+- Health checks
+- Métricas del sistema
+
+---
+
+# 🧠 Objetivos del proyecto
+
+## 🎯 Aprendizaje y desarrollo
+
+- Arquitectura empresarial
+- Sistemas escalables
+- Go Backend
+- DevOps
+- Docker
+- Seguridad avanzada
+- APIs REST
+- WebAssembly
+
+---
+
+# 🚧 Roadmap
+
+## 🔮 Próximas mejoras
+
+- 🤖 Inteligencia artificial
+- ☁️ Kubernetes
+- 📱 Aplicación móvil
+- 🌍 Multi idioma
+- 🔔 Notificaciones en tiempo real
+- 📊 IA analítica predictiva
+- 💳 Pasarelas de pago
+
+---
+
+# 🤝 Contribuciones
+
+Las contribuciones son bienvenidas ❤️
+
+## Cómo contribuir
+
+1. Fork del proyecto
+
+```bash
+git checkout -b feature/nueva-funcionalidad
+```
+
+2. Commit
+
+```bash
+git commit -m "✨ Nueva funcionalidad"
+```
+
+3. Push
+
+```bash
+git push origin feature/nueva-funcionalidad
+```
+
+4. Pull Request 🚀
+
+---
+
+# 👨‍💻 Desarrollador
+
+<div align="center">
+
+## Isai Reyes — Full Stack Developer
+
+Desarrollador apasionado por sistemas empresariales, arquitecturas escalables y plataformas modernas 🚀
+
+</div>
+
+---
+
+# 🌟 Apoya el proyecto
+
+⭐ Dale una estrella  
+🍴 Haz fork  
+📢 Comparte el proyecto
+
+---
+
+# 📜 Licencia
+
+Proyecto open source bajo licencia MIT orientado a sistemas empresariales y despliegues profesionales.
+
+---
+
+<div align="center">
+
+### 🎯 RentalCore — administración profesional de renta de equipos 🚀
+
+</div>
